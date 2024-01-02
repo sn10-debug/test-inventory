@@ -1,9 +1,9 @@
 import React from 'react'
-
+import Orders from '@/components/ordersTabs/tabs'
 const page = () => {
   return (
     <div>
-      hello from orders
+      <Orders/>
     </div>
   )
 }

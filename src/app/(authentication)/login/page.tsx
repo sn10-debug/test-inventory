@@ -1,4 +1,4 @@
-import SignInForm from '@/components/SignInForm';
+import SignInForm from '@/components/forms/SignInForm';
 import React from 'react';
 import { cookies } from 'next/headers'
  

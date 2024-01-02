@@ -196,7 +196,73 @@
                 "value":"Everywhere"
             }]
         }
-        ]
-        
-    
+        ],
+
+        "newListings":[
+            {
+                "id":1,
+                "label":"Add Photos",
+                "fields":[
+                    {
+                        "id":1,
+                        "type":"file"
+                    }
+                ]
+            },
+            {
+            "id":2,
+            "label":"Add Details",
+            "fields":[
+                {
+                    "id":1,
+                    "label":"Title",
+                    "type":"text",
+                    "placeholder":"title"
+                },{
+                    "id":2,
+                    "label":"Description",
+                    "type":"textarea",
+                    "placeholder":"description"
+                   
+                },{
+                    "id":3,
+                    "label":"Tags",
+                    "type":"text",
+                    "placeholder":"tags"
+                },{
+                    "id":4,
+                    "label":"Material Used",
+                    "type":"text"
+                }
+            ]
+        },{
+            "id":3,
+            "label":"Pricing",
+            "fields":[{
+                "id":1,
+                "label":"Price",
+                "type":"number",
+                "placeholder":"price"
+            },{
+                "id":2,
+                "label":"Quantity",
+                "type":"number"
+            },{
+                "id":3,
+                "label":"SKU",
+                "type":"text"
+            }]
+        },{
+            "id":4,
+            "label":"Variations",
+            "fields":[{
+                "id":1,
+                "label":"Variant Name",
+                "type":"text"
+            },{
+                "id":2,
+                "type":"button"
+            }]
+        }
+        ]   
 }

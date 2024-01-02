@@ -1,9 +1,9 @@
 import React from 'react'
-import {Listing} from '@/components/listings/lisitingLayout'
+import {NewListingForm} from '@/components/forms/newListingForm'
 const page = () => {
   return (
     <div>
-      <Listing/>
+      <NewListingForm/>
     </div>
   )
 }
