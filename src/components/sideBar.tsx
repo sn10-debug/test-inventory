@@ -18,9 +18,8 @@ export default function Sidebar({ show, setter }: { show: boolean, setter: React
                 onClick={() => {
                     setter(oldVal => !oldVal);
                 }}
-                className={`flex gap-1 [&>*]:my-auto text-md pl-6 py-3 border-b-[1px] border-b-white/10 `}
+                className={`flex gap-1 [&>*]:my-auto text-md pl-6 py-3 border-b-[1px] border-b-white/10 hover:bg-white/10 hover:text-white transition-colors duration-200`}
             >
-                
                 <div>{name}</div>
             </Link>
         )
@@ -37,7 +36,7 @@ export default function Sidebar({ show, setter }: { show: boolean, setter: React
     )
     return (
         <>
-            <div className={`${className}${appendClass}`}>
+            <div className={` ${className}${appendClass}`} style={{position:'fixed'}}>
                 <div className="p-2 flex max-w-screen-xl w-full object-contain">
                     <Link href="/">
                         <img

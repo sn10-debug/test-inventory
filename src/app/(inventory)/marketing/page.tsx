@@ -1,9 +1,9 @@
 import React from 'react'
-
+import MarketingTabs from '@/components/marketingTabs/tabs';
 const page = () => {
   return (
     <div>
-      hello from marketing
+      <MarketingTabs/>
     </div>
   )
 }
