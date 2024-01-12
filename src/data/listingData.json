@@ -1,0 +1,14 @@
+{
+    "listingData":[
+        {"id":1,"title":"saree border lace mirror","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-1.png"},
+        {"id":2,"title":"saree border lace mirror2","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png"},
+        {"id":3,"title":"saree border lace mirror3","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png"},
+        {"id":4,"title":"saree border lace mirror4","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png"}
+    ],"listingForm":[
+        {"id":1,"label":"edit image","type":"file"},
+        {"id":2,"label":"edit title","type":"text"},
+        {"id":3,"label":"edit sku","type":"text"},
+        {"id":4,"label":"edit price","type":"text"},
+        {"id":5,"label":"edit priceIndia","type":"text"}
+    ]
+}

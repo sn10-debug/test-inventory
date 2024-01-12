@@ -1,15 +1,34 @@
-import React from 'react'
+"use client";
+import React,{useState} from 'react'
 import { Button } from '../ui/button'
 import Link from 'next/link'
+import { Input } from '../ui/input'
+interface ListingManagerProps {
+  listingData: any;
+  onSearch: any;
+}
+const listingManager = ({listingData, onSearch}: ListingManagerProps) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-const listingManager = () => {
+  const handleSearch = () => {
+    const filteredData = listingData.filter((item: any) =>
+      item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    onSearch(filteredData);
+  };
   return (
-    <div>
-      <Link href={"/listings/newListing"}><Button className=""><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-full h-full">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-</svg>
-New Listing</Button></Link>
+    <div className='space-y-2'>
+      <Link href={"/listings/newListing"}><Button className="w-full text-[10px] md:text-sm lg:text-sm xl:text-sm">+ New Listing</Button></Link>
+<Input
+        type="text"
+        placeholder="Search"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onBlur={handleSearch}
+        className="w-full text-sm"
+      />
     </div>
+  
   )
 }
 
