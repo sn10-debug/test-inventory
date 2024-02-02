@@ -20,8 +20,7 @@ export function Listing() {
           <ListingCards filteredData={filteredData}  />
         </div>
       </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={0} maxSize={30} >
+      <ResizablePanel defaultSize={0} minSize={32} maxSize={32}>
         <div className="flex h-full p-6 flex-col">
           <ListingManager
             listingData={listingData}
