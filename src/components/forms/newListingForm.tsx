@@ -47,8 +47,10 @@ export function NewListingForm() {
     <Card>
       <CardContent className="p-8">
         {newListings.map((item) => (
-          <div className="flex flex-col gap-2 ">
-            <Label className="font-bold pt-8 text-lg">{item.label}</Label>
+          <div className="space-y-2">
+          <Label className="font-bold pt-8 text-lg">{item.label}</Label>
+          <div className="grid grid-cols-2 gap-2 ">
+            
             {item.fields.map((field) => (
               <div>
                 <Label>{field.label}</Label>
@@ -116,7 +118,9 @@ export function NewListingForm() {
               </div>
             ))}
           </div>
+        </div>
         ))}
+        
         <div className="mt-2 space-y-2">
           <Button onClick={() => addInput()}>+ Add variants</Button>
         </div>

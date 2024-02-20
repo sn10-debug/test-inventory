@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React,{useState} from 'react';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
@@ -20,9 +21,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from '../ui/button';
 const listingCards = ({filteredData}: {filteredData: any}) => {
+  const [showSidebar, setShowSidebar] = useState(false);
   return (
       <ScrollArea className="h-[570px] w-full rounded-md">
-      <div className='max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-col-2 lg:grid-cols-2 xl:grid-cols-2 gap-10 p-4'>
+      <div className='max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-col-2 lg:grid-cols-2 xl:grid-cols-3 gap-10 p-4'>
         {filteredData.map((item:any) => (      
         <Card className='' >
           <Image 
