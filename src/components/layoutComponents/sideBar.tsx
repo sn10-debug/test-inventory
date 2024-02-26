@@ -29,7 +29,7 @@ export default function Sidebar({ show, setter }: { show: boolean, setter: React
     // Overlay to prevent clicks in background, also serves as our close button
     const ModalOverlay = () => (
         <div
-            className={`flex fixed top-0 right-0 bottom-0 left-0 bg-black/50 md:bg-transparent  z-30`}
+            className={`flex fixed top-0 right-0 bottom-0 left-0 bg-black/50   z-30`}
             onClick={() => {
                 setter(oldVal => !oldVal);
             }}

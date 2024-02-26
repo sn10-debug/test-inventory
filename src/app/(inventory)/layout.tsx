@@ -17,7 +17,7 @@ export default function DashboardLayout({
             <div className="flex">
                 <MenuBarMobile setter={setShowSidebar} />
                 <Sidebar show={showSidebar} setter={setShowSidebar} />
-                <div className={`flex flex-col flex-grow max-w-screen-xl mx-auto md:w-full min-h-screen xl:pl-[${showSidebar ?   '225':'80'  }px] lg:pl-[${showSidebar ? '80' : '225'  }px] md:pl-[${showSidebar ?  '258':'80' }px] sm:px-[20px] pt-[100px] pb-[10px]`}>
+                <div className={`flex flex-col flex-grow max-w-screen-xl mx-auto md:w-full min-h-screen  sm:px-[10px] pt-[100px] pb-[10px]`}>
     {children}
 </div>
 
