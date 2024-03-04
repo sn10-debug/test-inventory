@@ -17,6 +17,7 @@ import "filepond/dist/filepond.min.css";
 
 import Image from "next/image"
 import jsonData from "@/data/orders.json"
+import Link from "next/link";
 
 const ready = () => {   
   const data=jsonData;
@@ -40,8 +41,8 @@ const ready = () => {
             </CardDescription>
           </CardHeader>
           {item.products.map((product:any) => (
-          <CardContent className="flex flex-row space-x-4 justify-around">      
-            <Image src={product?.image} alt={""} width={100} height={100} />     
+          <CardContent className="flex flex-row space-x-4 justify-around items-center">      
+          <Image src={product?.image} alt={""} width={100} height={100} />     
             <div className="flex flex-col space-y-2">
             <CardDescription>{product.productName}</CardDescription>
               <div className="flex justify-between">
@@ -56,7 +57,7 @@ const ready = () => {
                 <CardDescription className="flex flex-row space-x-2"><p>height:</p> <Input type="number"></Input></CardDescription>
               </div>
              </div>
-            <div className="grid w-[143px] w-full ">
+            <div className="grid w-[103px] w-full ">
             <FilePond
                       files={files}
                       credits={false}
@@ -115,7 +116,7 @@ const ready = () => {
 }
                           
           <CardFooter className="flex justify-end">
-            <Button>confirm</Button>
+            <Button><Link href={"/admin/orders"}>confirm</Link></Button>
           </CardFooter></Card>
           ))}
         </Card>

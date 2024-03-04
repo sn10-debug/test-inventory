@@ -12,14 +12,22 @@
             "quantity": 1,
             "category":"Rose Gold Flower",
             "sku": " 11303 O3 GZC GVJ",
-            "image":"/clearance-1.png"
+            "image":"/clearance-1.png",
+            "width":"100 cm",
+            "height":"100 cm",
+            "weight":"100 g",
+            "length":"100 cm"
         },{
             "id":2,
             "productName": "Net Fabric Saree Border Indian Lace Trim By The Yard, Sari Fabric Trim-Table Runner-Art Quilt fabric trim Sari Border Silk Fabric",
             "quantity": 1,
             "category":"Rose Gold Flower",
             "sku": " 11303 O3 GZC GVJ",
-            "image":"/clearance-2.png"
+            "image":"/clearance-2.png",
+            "width":"100 cm",
+            "height":"100 cm",
+            "weight":"100 g",
+            "length":"100 cm"
 
         }]},
         {
@@ -35,14 +43,22 @@
                 "quantity": 1,
                 "category":"Rose Gold Flower",
                 "sku": " 11303 O3 GZC GVJ",
-                "image":"/clearance-1.png"
+                "image":"/clearance-1.png",
+                "width":"100 cm",
+                "height":"100 cm",
+                "weight":"100 g",
+                "length":"100 cm"
             },{
                 "id":2,
                 "productName": "Net Fabric Saree Border Indian Lace Trim By The Yard, Sari Fabric Trim-Table Runner-Art Quilt fabric trim Sari Border Silk Fabric",
                 "quantity": 1,
                 "category":"Rose Gold Flower",
                 "sku": " 11303 O3 GZC GVJ",
-                "image":"/clearance-2.png"
+                "image":"/clearance-2.png",
+                "width":"100 cm",
+                "height":"100 cm",
+                "weight":"100 g",
+                "length":"100 cm"
             }]}
     ]
     
