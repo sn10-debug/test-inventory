@@ -3,6 +3,9 @@ import React,{useState} from 'react'
 import { Button } from '../ui/button'
 import Link from 'next/link'
 import { Input } from '../ui/input'
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+ 
 interface ListingManagerProps {
   listingData: any;
   onSearch: any;
@@ -29,7 +32,29 @@ const listingManager = ({listingData, onSearch}: ListingManagerProps) => {
         onBlur={handleSearch}
         className="w-full text-sm"
       />
-      
+      <h1 className='font-bold'>Listing Status</h1>
+      <RadioGroup defaultValue="comfortable">
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="option-one" id="option-one" />
+        <Label htmlFor="option-one">Active</Label>
+      </div>
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="option-two" id="option-two" />
+        <Label htmlFor="option-two">Draft</Label>
+      </div>
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="option-three" id="option-three" />
+        <Label htmlFor="option-three">Expired</Label>
+      </div>
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="option-four" id="option-four" />
+        <Label htmlFor="option-four">Sold Out</Label>
+      </div>
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="option-five" id="option-five" />
+        <Label htmlFor="option-five">Inactive</Label>
+      </div>
+    </RadioGroup>
 
 
       <h1 className='font-bold'>Options</h1>

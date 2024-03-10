@@ -51,13 +51,13 @@ const ready = () => {
                 <CardDescription>Category:{product.category}</CardDescription>
               </div>
               <div className="flex justify-between space-x-4">
-                <CardDescription className="flex flex-row space-x-2"><p>Weight:</p> <Input type="number"></Input></CardDescription>
-                <CardDescription className="flex flex-row space-x-2"><p>length:</p> <Input type="number"></Input></CardDescription>
-                <CardDescription className="flex flex-row space-x-2"><p>width:</p> <Input type="number"></Input></CardDescription>
-                <CardDescription className="flex flex-row space-x-2"><p>height:</p> <Input type="number"></Input></CardDescription>
+                <CardDescription className="flex flex-row space-x-2"><p>Weight:</p> <Input type="number" min={0}></Input></CardDescription>
+                <CardDescription className="flex flex-row space-x-2"><p>length:</p> <Input type="number" min={0}></Input></CardDescription>
+                <CardDescription className="flex flex-row space-x-2"><p>width:</p> <Input type="number" min={0}></Input></CardDescription>
+                <CardDescription className="flex flex-row space-x-2"><p>height:</p> <Input type="number" min={0}></Input></CardDescription>
               </div>
              </div>
-            <div className="grid w-[103px] w-full ">
+            <div className="grid w-[103px]  ">
             <FilePond
                       files={files}
                       credits={false}

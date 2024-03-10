@@ -49,11 +49,6 @@ export default function Sidebar({ show, setter }: { show: boolean, setter: React
             </button>
                     <Link href="/" className='flex justify-center items-center'>
 
-                        <img
-                        src="/Footer-logo.png"
-                        alt="Logo"
-                        className="w-12 h-12"
-                         />
                          <h1 className='text-white text-3xl'>BohoTree</h1>
                     </Link>
                 </div>
