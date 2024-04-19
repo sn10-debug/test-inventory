@@ -116,7 +116,7 @@ const ready = () => {
 }
                           
           <CardFooter className="flex justify-end">
-            <Button><Link href={"/admin/orders"}>confirm</Link></Button>
+            <Button>confirm</Button>
           </CardFooter></Card>
           ))}
         </Card>

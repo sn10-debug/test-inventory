@@ -22,7 +22,7 @@ const listingManager = ({listingData, onSearch}: ListingManagerProps) => {
   };
   return (
     <>
-    <div className='space-y-2'>
+    <div className='space-y-4'>
       <Link href={"/listings/newListing"}><Button className="w-full text-[10px] md:text-sm lg:text-sm xl:text-sm">+ New Listing</Button></Link>
       <Input
         type="text"
@@ -55,14 +55,6 @@ const listingManager = ({listingData, onSearch}: ListingManagerProps) => {
         <Label htmlFor="option-five">Inactive</Label>
       </div>
     </RadioGroup>
-
-
-      <h1 className='font-bold'>Options</h1>
-      <div className='flex flex-col sm:flex-col md:flex-col lg:flex-col xl:flex-row justify-between gap-4 '>
-      {buttons.map((item)=>(
-        <Button className=''><h1 className='text-xs md:text-sm lg:text-sm xl:text-sm'>{item.name}</h1></Button>
-      ))}
-      </div>
     </div>
 
     

@@ -42,7 +42,7 @@ const pending = () => {
           ))
 }
           <CardFooter className="flex justify-end">
-            <Button><Link href={'/staff/orders'}>proceed</Link></Button>
+            <Button><Link href={'/orders/staff'}>proceed</Link></Button>
           </CardFooter></Card>
           ))}
         </Card>

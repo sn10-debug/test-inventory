@@ -67,7 +67,7 @@ export function NewListingForm() {
                         pond = ref;
                       }}
                       required
-                      acceptedFileTypes={["application/pdf", "image/*"]}
+                      acceptedFileTypes={["image/*"]}
                       fileValidateTypeDetectType={(source, type) =>
                         new Promise((resolve, reject) => {
                           resolve(type);
