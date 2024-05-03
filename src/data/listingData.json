@@ -1,10 +1,14 @@
 {
     "listingData":[
-        {"id":1,"title":"saree border lace mirror","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-1.png"},
-        {"id":2,"title":"saree border lace mirror2","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png"},
-        {"id":3,"title":"saree border lace mirror3","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png"},
-        {"id":4,"title":"saree border lace mirror4","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png"}
-    ],"listingForm":[
+        {"id":1,"title":"saree border lace mirror","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-1.png","status":"Active"},
+        {"id":2,"title":"border lace mirror2","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png","status":"Draft"},
+        {"id":3,"title":"saree border lace mirror3","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png","status":"Active"},
+        {"id":4,"title":"saree border lace mirror4","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png","status":"Expired"},
+        {"id":5,"title":"saree border lace mirror3","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png","status":"Expired"},
+        {"id":6,"title":"border lace mirror4","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png","status":"Soldout"},
+        {"id":7,"title":"lace mirror","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png","status":"soldout"},
+        {"id":8,"title":"saree border lace ","sku":"FLT 42 82, FLT39 82. FLT 40 82","price":"$ 1.00","priceIndia":"INR 100","image":"/clearance-2.png","status":"Inactive"}
+        ],"listingForm":[
         {"id":1,"label":"edit image","type":"file"},
         {"id":2,"label":"edit title","type":"text"},
         {"id":3,"label":"edit sku","type":"text"},
