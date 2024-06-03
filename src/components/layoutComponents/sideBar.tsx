@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { FiMenu as Icon } from 'react-icons/fi'
 
 export default function Sidebar({ show, setter }: { show: boolean, setter: React.Dispatch<React.SetStateAction<boolean>> }) {
-    const navigation=[{id:1,name:'Listings',route:'/listings'},{id:2,name:'Orders',route:'orders/admin'},{id:3,name:'Statistics',route:'/stats'},{id:4,name:'Marketing',route:'/marketing'},{id:5,name:'Messages',route:'/messaging/inbox'}]
+    const navigation=[{id:1,name:'Listings',route:'/listings'},{id:2,name:'Orders',route:'orders/admin'},{id:3,name:'Statistics',route:'/stats'},{id:4,name:'Sale',route:'/sale'},{id:4,name:'PromoCode',route:'/promoCode'},{id:5,name:'Messages',route:'/messaging/inbox'}]
     // Define our base class
     const className = "bg-black w-[250px] transition-[margin-left] ease-in-out duration-500 fixed md:static top-0 bottom-0 left-0 z-40";
     // Append class based on state of sidebar visiblity
