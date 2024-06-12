@@ -147,7 +147,7 @@ const DataTable = ({ data }:{data:any}) => {
           {Array.from({ length: totalPages }, (_, index) => (
             <li key={index} className="mr-2">
               <button
-                className={`px-3 py-1 ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                className={`px-3 py-1 rounded ${currentPage === index + 1 ? 'bg-black text-white' : 'bg-gray-200'}`}
                 onClick={() => paginate(index + 1)}
               >
                 {index + 1}

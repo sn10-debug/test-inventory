@@ -12,10 +12,7 @@ const sale = () => {
     <div>
       <Card>
           <CardHeader>
-            <CardTitle>Run a sale</CardTitle>
-            <CardDescription>
-              Manage your sale settings here. These settings will apply to all.
-            </CardDescription>
+            <CardTitle className="text-3xl">Sales</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {sale.map((item)=>(

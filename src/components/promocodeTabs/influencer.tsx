@@ -10,14 +10,9 @@ const promoCode = () => {
     const { regions,promoCode } = jsonData
   return (
     <Card>
-      <CardHeader>
-            <CardTitle>Create a promo code</CardTitle>
-            <CardDescription>
-              Manage your promo code settings here. These settings will apply to
-              all.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
+            <CardTitle className="p-4">Create a influencer promoCode</CardTitle>
+
+          <CardContent className="space-y-2 p-4">
           {promoCode.map((item)=>(
             <div className="space-y-1">
               <Label>{item.label}</Label>

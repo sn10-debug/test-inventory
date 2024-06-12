@@ -110,10 +110,11 @@ const App = () => {
   
   return (
     <Card>
-      <div className="flex flex-row justify-center w-full">
+      <h1 className='p-4 font-bold text-3xl'>Listing Dashboard</h1>
+      <div className="flex flex-row justify-center w-full ">
         <div className="grid w-3/4"> {/* Only display cards after search button click */}
           {cards.listingData.length > 0 && (
-            <ScrollArea className='h-[600px] w-full rounded-md'>
+            <ScrollArea className='h-[550px] w-full rounded-md'>
               <div className='max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-col-2 lg:grid-cols-2 xl:grid-cols-3  gap-10 p-4'>
                 {cards.listingData.map((card) => (
                   <CardComponent
