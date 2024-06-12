@@ -1,5 +1,6 @@
 // pages/index.js
 import Dashboard from '@/components/stats/graph';
+import DataTable from '@/components/stats/stats-table';
 import { Card } from '@/components/ui/card';
 
 const data = {
@@ -12,8 +13,9 @@ const data = {
 
 const HomePage = () => (
   <Card className='space-y-4 p-6'>
-    <h1 className='font-bold text-3xl'>Dashboard</h1>
+    <h1 className='font-bold text-3xl'>Statistical Dashboard</h1>
     <Dashboard data={data} />
+    <DataTable data={data} />
   </Card>
 );
 
