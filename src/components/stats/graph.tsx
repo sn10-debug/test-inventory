@@ -1,94 +1,114 @@
+// components/Dashboard.js
 'use client';
-import React, { useState, useEffect } from 'react';
-import { Chart } from 'chart.js';
+import { useState } from 'react';
+import { Line, Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 
-const LineChart = () => {
-  const [data, setData] = useState([]);
-  const [selectedMetric, setSelectedMetric] = useState('visits');
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
-  // Sample data (replace with your actual data fetching logic)
-  const sampleData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+const Dashboard = ({ data }:{data:any}) => {
+  const [selectedGraph, setSelectedGraph] = useState('visits');
+
+  const chartData: { [key: string]: any } = {
+    visits: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'Number of Visits',
+          data: data.visits,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          fill: true,
+        },
+      ],
+    },
+    orders: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'Number of Orders',
+          data: data.orders,
+          borderColor: 'rgba(153, 102, 255, 1)',
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          fill: true,
+        },
+      ],
+    },
+    conversionRates: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'Conversion Rate (%)',
+          data: data.conversionRates,
+          borderColor: 'rgba(255, 159, 64, 1)',
+          backgroundColor: 'rgba(255, 159, 64, 0.2)',
+          fill: true,
+        },
+      ],
+    },
+    revenue: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'Revenue ($)',
+          data: data.revenue,
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          fill: true,
+        },
+      ],
+    },
+  };
+
+  const pieData = {
+    labels: data.labels,
     datasets: [
       {
-        label: 'Visits',
-        data: [100, 120, 150, 180, 200],
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-      },
-      {
-        label: 'Orders',
-        data: [5, 8, 12, 15, 18],
-        borderColor: 'rgba(54, 162, 235, 1)',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-      },
-      {
-        label: 'Conversion Rate',
-        data: [2.5, 3.33, 4, 4.76, 5],
-        borderColor: 'rgba(255, 206, 86, 1)',
-        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-      },
-      {
-        label: 'Revenue',
-        data: [1000, 1500, 2000, 2500, 3000],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        label: selectedGraph,
+        data: data[selectedGraph],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)',
+          'rgba(199, 199, 199, 0.2)',
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)',
+          'rgba(199, 199, 199, 1)',
+        ],
+        borderWidth: 1,
       },
     ],
   };
 
-  useEffect(() => {
-    const chartData = {
-      labels: sampleData.labels,
-      datasets: sampleData.datasets.filter(
-        (dataset) => dataset.label === selectedMetric
-      ),
-    };
-    setData(chartData);
-  }, [selectedMetric]);
-
-  const handleMetricChange = (event) => {
-    setSelectedMetric(event.target.value);
-  };
-
-  const chartRef = React.createRef();
-
-  useEffect(() => {
-    const ctx = chartRef.current.getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data,
-      options: {
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Time Period',
-            },
-          },
-          y: {
-            title: {
-              display: true,
-              text: selectedMetric,
-            },
-          },
-        },
-      },
-    });
-  }, [data]);
-
   return (
-    <div>
-      <h2>Line Chart</h2>
-      <select value={selectedMetric} onChange={handleMetricChange}>
-        <option value="visits">Visits</option>
-        <option value="orders">Orders</option>
-        <option value="conversionRate">Conversion Rate</option>
-        <option value="revenue">Revenue</option>
-      </select>
-      <canvas ref={chartRef} width={600} height={400} />
+    <div className='space-y-4 p-4'>
+      <div className="flex ">
+        <select className="mb-4 cursor-pointer items-center rounded-md px-3 py-2 text-sm outline-none focus:bg-accent" onChange={(e) => setSelectedGraph(e.target.value)} value={selectedGraph}>
+          <option value="visits">Site Visits</option>
+          <option value="orders">Orders</option>
+          <option value="conversionRates">Conversion Rate</option>
+          <option value="revenue">Revenue</option>
+        </select>
+      </div>
+      <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 justify-center items-center">
+        <div className='w-full '>
+          <Line data={chartData[selectedGraph]} />
+        </div>
+        <div className=' h-3/4 w-2/4'>
+          <Pie data={pieData} />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default LineChart;
+export default Dashboard;
