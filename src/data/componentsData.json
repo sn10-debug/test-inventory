@@ -835,6 +835,22 @@
         },
         {
             "id": 5,
+            "label": "Colour",
+            "fields": [
+                {
+                    "id": 1,
+                    "label": "Primary Colour*",
+                    "type": "text"
+                },
+                {
+                    "id": 1,
+                    "label": "Secondary Colour",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "id": 6,
             "label": "Variations",
             "fields": [
                 {
