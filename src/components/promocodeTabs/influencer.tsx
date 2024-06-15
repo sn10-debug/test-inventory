@@ -7,7 +7,7 @@ import {Select,SelectContent,SelectGroup,SelectItem,SelectLabel,SelectTrigger,Se
 import { Textarea } from "../ui/textarea"
 import jsonData from "@/data/componentsData.json"
 const promoCode = () => {
-    const { regions,promoCode } = jsonData
+    const { regions,influencer_promoCode : promoCode } = jsonData
   return (
     <Card>
             <CardTitle className="p-4">Create a influencer promoCode</CardTitle>
