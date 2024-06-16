@@ -1,130 +1,202 @@
 "use client";
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import jsonData from "@/data/componentsData.json";
 import { Button } from "../ui/button";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Textarea } from "../ui/textarea";
-import { FilePond, registerPlugin } from "react-filepond";
-import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
-import FilePondPluginFileEncode from "filepond-plugin-file-encode";
-import FilePondPluginImageTransform from "filepond-plugin-image-transform";
-import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import FilePondPluginImageResize from "filepond-plugin-image-resize";
-import FilePondPluginImageCrop from "filepond-plugin-image-crop";
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import "filepond/dist/filepond.min.css";
+interface FileWithStatus {
+  file: File;
+  approved: boolean;
+}
 
-registerPlugin(
-  FilePondPluginImageExifOrientation,
-  FilePondPluginImagePreview,
-  FilePondPluginFileEncode,
-  FilePondPluginFileValidateSize,
-  FilePondPluginFileValidateType,
-  FilePondPluginImageResize,
-  FilePondPluginImageCrop,
-  FilePondPluginImageTransform
-);
+// Define the Zod schema
+const schema = z.object({
+  title: z.string().min(5, "Title must be at least 5 characters long"),
+  description: z.string().min(5, "Description must be at least 5 characters long"),
+  files: z
+    .array(
+      z.object({
+        file: z.instanceof(File),
+        approved: z.boolean(),
+      })
+    )
+    .min(1, "At least one approved image is required")
+    .refine((files) => files.some((file) => file.approved), {
+      message: "At least one approved image is required",
+    }),
+});
 
 export function NewListingForm() {
-  const [files, setFiles] = useState([]);
-  let pond: any = null;
-  const { newListings } = jsonData;
-  const addInput = () => {
-    const inputCont = document.getElementById("input-cont");
-    const input = document.createElement("input");
-    input.type = "text";
-    input.className =
-      "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
-    input.placeholder = "New Variant";
-    inputCont?.appendChild(input);
-  };
-  return (
-    <Card>
-      <CardContent className="p-8">
-        {newListings.map((item) => (
-          <div className="space-y-2">
-          <Label className="font-bold pt-8 text-lg">{item.label}</Label>
-          <div className="grid grid-cols-2 gap-2 ">
-            
-            {item.fields.map((field) => (
-              <div>
-                <Label>{field.label}</Label>
-                {field.type === "textarea" ? (
-                  <Textarea />
-                ) : field.type == "button" ? (
-                  <div id="input-cont" className="space-y-2"></div>
-                ) : field.type == "file" ? (
-                  <div className="grid w-full w-full items-center gap-1.5 ">
-              <FilePond
-                      files={files}
-                      credits={false}
-                      ref={(ref) => {
-                        pond = ref;
-                      }}
-                      required
-                      acceptedFileTypes={["image/*"]}
-                      fileValidateTypeDetectType={(source, type) =>
-                        new Promise((resolve, reject) => {
-                          resolve(type);
-                        })
-                      }
-                      allowFileEncode
-                      allowImageTransform
-                      imagePreviewHeight={400}
-                      imageCropAspectRatio={"1:1"}
-                      imageResizeTargetWidth={100}
-                      imageResizeTargetHeight={100}
-                      imageResizeMode={"cover"}
-                      imageTransformOutputQuality={50}
-                      imageTransformOutputQualityMode="optional"
-                      imageTransformBeforeCreateBlob={(canvas: unknown) =>
-                        new Promise((resolve) => {
-                          const ctx = (canvas as HTMLCanvasElement).getContext("2d");
-                          if (ctx) {
-                            ctx.font = "48px serif";
-                          }
-                          if (ctx) {
-                            ctx.fillText("Hello world", 10, 50);
-                          }
+  const [files, setFiles] = useState<FileWithStatus[]>([]);
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
 
-                          console.log("imageTransformBeforeCreateBlob", ctx, canvas);
-                          resolve(canvas);
-                        })
-                      }
-                      imageTransformAfterCreateBlob={(blob: unknown) =>
-                        new Promise((resolve) => {
-                          console.log("imageTransformAfterCreateBlob", blob);
-                          resolve(blob);
-                        })
-                      }
-                      instantUpload={false}
-                      allowMultiple={true}
-                      maxFiles={10}
-                      server="https://httpbin.org/post"
-                      name="files"
-                      labelIdle='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                    </svg>
-                    '
-                    />                  </div>
-                ) : (
-                  <Input type={field.type} />
-                )}
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newFiles = Array.from(event.target.files).map((file) => ({
+        file,
+        approved: false,
+      }));
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    }
+  };
+
+  const handleRemove = (index: number) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleApprove = (index: number) => {
+    setFiles((prevFiles) =>
+      prevFiles.map((file, i) =>
+        i === index ? { ...file, approved: !file.approved } : file
+      )
+    );
+  };
+
+  const onSubmit = (data: any) => {
+    const approvedFiles = files.filter((file) => file.approved);
+    const formData = new FormData();
+    approvedFiles.forEach((file) => {
+      formData.append("files", file.file);
+    });
+    
+    // Add other form fields to formData as needed
+    // Submit the formData to your API
+  };
+
+  return (
+    <div className="space-y-4">
+       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <Card className="bg-gray-100">
+      <CardContent className="p-8">
+        <CardHeader>
+          <CardTitle className="font-bold text-2xl">About</CardTitle>
+          <CardDescription>Tell the world all about your item and why they'll love it.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4" >
+         
+            <div>
+              <div className="space-y-2 mb-2">
+                <CardTitle>Title*</CardTitle>
+                <CardDescription>Include keywords that buyers would use to search for this item.</CardDescription>
               </div>
-            ))}
-          </div>
-        </div>
-        ))}
-        
-        <div className="mt-2 space-y-2">
-          <Button onClick={() => addInput()}>+ Add variants</Button>
-        </div>
+              <Textarea placeholder="Enter title" {...register("title")} />
+              {errors.title && <p className="text-red-500">{String(errors.title.message)}</p>}
+            </div>
+            <div>
+              <div className="space-y-2 mb-2">
+                <CardTitle>Photo and video*</CardTitle>
+                <CardDescription>Add up to 10 photos and 1 video</CardDescription>
+              </div>
+              <Input
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                onChange={handleFileChange}
+              />
+              {errors.files && <p className="text-red-500">{String(errors.files.message)}</p>}
+              <div className="mt-4 space-y-4">
+                {files.map((fileWithStatus, index) => (
+                  <div key={index} className="flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      {fileWithStatus.file.type.startsWith("image/") ? (
+                        <img
+                          src={URL.createObjectURL(fileWithStatus.file)}
+                          alt="preview"
+                          className="h-16 w-16 object-cover"
+                        />
+                      ) : (
+                        <video
+                          src={URL.createObjectURL(fileWithStatus.file)}
+                          className="h-16 w-16 object-cover"
+                          controls
+                        />
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={() => handleRemove(index)}
+                      className="bg-red-500 hover:bg-red-700"
+                    >
+                      Remove
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => handleApprove(index)}
+                      className={`${
+                        fileWithStatus.approved
+                          ? "bg-green-500 hover:bg-green-700"
+                          : "bg-gray-500 hover:bg-gray-700"
+                      }`}
+                    >
+                      {fileWithStatus.approved ? "Approved" : "Approve"}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="space-y-2 mb-2">
+                <CardTitle>Description*</CardTitle>
+                <CardDescription>What makes your item special?</CardDescription>
+              </div>
+              <Textarea placeholder="Enter Description" {...register("description")} />
+              {errors.description && <p className="text-red-500">{String(errors.description.message)}</p>}
+            </div>
+           
+          
+        </CardContent>
       </CardContent>
     </Card>
+    <Card className="bg-gray-100">
+      <CardContent className="p-8">
+        <CardHeader>
+          <CardTitle className="font-bold text-2xl">Price & Inventory</CardTitle>
+          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
+        </CardHeader>
+        </CardContent >
+        </Card>
+        <Card className="bg-gray-100">
+      <CardContent className="p-8">
+        <CardHeader>
+          <CardTitle className="font-bold text-2xl">Variations</CardTitle>
+          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
+        </CardHeader>
+        </CardContent >
+        </Card>
+    <Card className="bg-gray-100">
+      <CardContent className="p-8">
+        <CardHeader>
+          <CardTitle className="font-bold text-2xl">Detail</CardTitle>
+          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
+        </CardHeader>
+        </CardContent >
+        </Card>
+        <Card className="bg-gray-100">
+      <CardContent className="p-8">
+        <CardHeader>
+          <CardTitle className="font-bold text-2xl">Shiping</CardTitle>
+          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
+        </CardHeader>
+        </CardContent >
+        </Card>
+
+        <Button type="submit" className="w-full mt-4">
+              Submit
+            </Button>
+    </form>
+   </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import data from "@/data/listingData.json";
+import axios from 'axios';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import Image from 'next/image';
@@ -16,8 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 
-const CardComponent = ({ title, content, id, image, sku, price, priceIndia, status }:
-  { title: any, content: any, id: any, image: any, sku: any, price: any, priceIndia: any, status: any }) => {
+const CardComponent = ({ title, content, id, image, sku, price, priceIndia, status, variants, draft }: { title: string, content: string, id: string, image: string, sku: string, price: number, priceIndia: number, status: string, variants: { SKU: string }[], draft?: boolean }) => {
   return (
     <Card className=''>
       <Image
@@ -25,12 +24,12 @@ const CardComponent = ({ title, content, id, image, sku, price, priceIndia, stat
         width={500}
         height={500}
         alt="product image"
-        className='w-full h-80 hover:scale-105 object-contain md:object-contain xl:object-fill lg:object-contain'
+        className='w-full h-80 rounded hover:scale-105 object-contain md:object-contain xl:object-fill lg:object-contain'
       />
       <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
       <CardContent className='space-y-2'>
         <div className='text-gray-500 text-sm'>SKU : {sku}</div>
-        <div className='text-gray-500 text-sm'>Price(Indian) :{price} </div>
+        <div className='text-gray-500 text-sm'>Price(Indian) : {price} </div>
         <div className='text-gray-500 text-sm'>Price(Everywhere) : {priceIndia}</div>
         <div className='flex flex-row items-center justify-between'>
           <div>
@@ -42,7 +41,7 @@ const CardComponent = ({ title, content, id, image, sku, price, priceIndia, stat
                 </svg>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
-                <Link href={{ pathname: `/listings/${id}` }} key={id}>
+                <Link href={`/listings/${id}`} key={id}>
                   <DropdownMenuItem>
                     Edit
                   </DropdownMenuItem>
@@ -70,63 +69,105 @@ const CardComponent = ({ title, content, id, image, sku, price, priceIndia, stat
 };
 
 const App = () => {
-  const [cards, setCards] = useState<{ listingData: { id: number; title: string; sku: string; price: string; priceIndia: string; image: string; status: string; }[]; listingForm: { id: number; label: string; type: string; }[]; }>(data);
+  const [cards, setCards] = useState<{
+    draft: any; _id: string, name: string, description: string, images: string[], commonPrice: number, variants: { SKU: string }[] 
+  }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]); // State for search suggestions
   const [selectedStatus, setSelectedStatus] = useState('');
-  
+  const [searchResults, setSearchResults] = useState(cards);
+
+  const fetchAllData = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/listing');
+      setCards(response.data);
+      setSearchResults(response.data); // Initially, display all data
+    } catch (error) {
+      console.error('Error fetching all data:', error);
+    }
+  };
+
+  const fetchActiveData = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/listing/active');
+      setCards(response.data);
+      setSearchResults(response.data); // Update search results with active data
+    } catch (error) {
+      console.error('Error fetching active data:', error);
+    }
+  };
+
+  const fetchDraftData = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/listing/draft');
+      setCards(response.data);
+      setSearchResults(response.data); // Update search results with draft data
+    } catch (error) {
+      console.error('Error fetching draft data:', error);
+    }
+  };
+
   useEffect(() => {
-    const filteredSuggestions = [...data.listingData].filter((card) =>
-      card.title.toLowerCase().startsWith(searchTerm.toLowerCase())
-    ).map((card) => card.title); // Example logic
-
+    const filteredSuggestions = cards.filter((card) =>
+      card.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    ).map((card) => card.name);
     setSuggestions(filteredSuggestions);
-  }, [searchTerm]);
+  }, [searchTerm, cards]);
 
-  const handleSearch = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchTerm(suggestion); // Update search term based on clicked suggestion
+  const handleSuggestionClick = (suggestion: string): void => {
+    setSearchTerm(suggestion);
   };
-  
-  const filterData = (status: any) => {
-    const filteredCards =
-      status === ''
-        ? data.listingData
-        : data.listingData.filter((card) => card.status.toLowerCase() === status.toLowerCase());
-    setCards({ listingData: filteredCards, listingForm: data.listingForm });
+
+  const filterData = async (status: string): Promise<void> => {
+    if (status === '') {
+      await fetchAllData();
+    } else if (status === 'active') {
+      await fetchActiveData();
+    } else if (status === 'draft') {
+      await fetchDraftData();
+    }
   };
-  
-  const handleStatusChange = (value: any) => {
+
+  const handleStatusChange = (value: string): void => {
     setSelectedStatus(value);
     filterData(value);
   };
-  
+
+  const handleSearchButtonClick = () => {
+    const results = cards.filter(card =>
+      card.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setSearchResults(results);
+  };
+
   useEffect(() => {
-    filterData('');
+    fetchAllData();
   }, []);
-  
+
   return (
     <Card>
       <h1 className='p-4 font-bold text-3xl'>Listing Dashboard</h1>
       <div className="flex flex-row justify-center w-full ">
         <div className="grid w-3/4"> {/* Only display cards after search button click */}
-          {cards.listingData.length > 0 && (
+          {searchResults.length > 0 && (
             <ScrollArea className='h-[550px] w-full rounded-md'>
-              <div className='max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-col-2 lg:grid-cols-2 xl:grid-cols-3  gap-10 p-4'>
-                {cards.listingData.map((card) => (
+              <div className='max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-col-2 lg:grid-cols-2 xl:grid-cols-3 gap-10 p-4'>
+                {searchResults.map((card) => (
                   <CardComponent
-                    key={card.id}
-                    id={card.id}
-                    title={card.title}
-                    content={card.price}
-                    image={card.image}
-                    price={card.price}
-                    priceIndia={card.priceIndia}
-                    sku={card.sku}
-                    status={card.status}
+                    key={card._id}
+                    id={card._id}
+                    title={card.name}
+                    content={card.description}
+                    image={card.images[0]}
+                    price={card.commonPrice}
+                    priceIndia={card.commonPrice}
+                    sku={card.variants[0]?.SKU || 'N/A'}
+                    status={card.draft ? 'draft' : 'active'}
+                    variants={[]}                  
                   />
                 ))}
               </div>
@@ -134,53 +175,48 @@ const App = () => {
           )}
         </div>
         <div className='space-y-4 w-1/4 p-4'>
-          <Link href={"/listings/newListing"}><Button className="w-full text-[10px] md:text-sm lg:text-sm xl:text-sm">+ New Listing</Button></Link>
-          <div className="flex md:flex-row flex-col gap-2">
+          <Link href={"/listings/newListing"}>
+            <Button className=''>Add New Listing</Button>
+          </Link>
+          <div className="flex items-center space-x-2">
             <Input
               type="text"
+              placeholder="Search"
               value={searchTerm}
               onChange={handleSearch}
-              list="suggestions" // Add list attribute for suggestions
+              list="suggestions" // Link input to datalist
             />
-            <datalist id="suggestions"> {/* Datalist element for suggestions */}
-              <div className='w-full'>
-                {suggestions.map((suggestion) => (
-                  <option key={suggestion} value={suggestion} onClick={() => handleSuggestionClick(suggestion)}>
-                    {suggestion}
-                  </option>
-                ))}
-              </div>
-            </datalist>
-            <Button onClick={() => { // Perform search and update cards
-              const filteredCards = data.listingData.filter((card) =>
-                card.title.toLowerCase().includes(searchTerm.toLowerCase())
-              );
-              setCards({ listingData: filteredCards, listingForm: data.listingForm });
-            }}>
-              Search
-            </Button>
+            <Button onClick={handleSearchButtonClick}>Search</Button>
           </div>
-          <>
-            <h1 className='font-bold'>Listing Status</h1>
-            <RadioGroup defaultValue={selectedStatus} onValueChange={handleStatusChange}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="" id="all" />
-                <Label htmlFor="all">All</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="active" id="option-one" />
-                <Label htmlFor="option-one">Active</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="draft" id="option-two" />
-                <Label htmlFor="option-two">Draft</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="soldout" id="option-four" />
-                <Label htmlFor="option-four">Sold Out</Label>
-              </div>
-            </RadioGroup>
-          </>
+          <datalist id="suggestions">
+            {suggestions.map((suggestion, index) => (
+              <option key={index} value={suggestion} />
+            ))}
+          </datalist>
+          <Card className=''>
+            <CardHeader>
+              <CardTitle>Filter</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-2'>
+              <RadioGroup
+                value={selectedStatus}
+                onValueChange={handleStatusChange}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="">All</RadioGroupItem>
+                  <Label>All</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="active">Active</RadioGroupItem>
+                  <Label>Active</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="draft">Draft</RadioGroupItem>
+                  <Label>Draft</Label>
+                </div>
+              </RadioGroup>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </Card>
