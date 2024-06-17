@@ -1,0 +1,181 @@
+{
+    "statsOverview": {
+      "past7Days": [
+        {
+          "label": "Total Views",
+          "value": "11.4K",
+          "change": "44% YoY",
+          "changeType": "down"
+        },
+        {
+          "label": "Visits",
+          "value": "3,017",
+          "change": "51% YoY",
+          "changeType": "down"
+        },
+        {
+          "label": "Orders",
+          "value": "40",
+          "change": "44% YoY",
+          "changeType": "down"
+        },
+        {
+          "label": "Revenue",
+          "value": "$1,565",
+          "change": "43% YoY",
+          "changeType": "down"
+        }
+      ],
+      "past1Month": [
+        {
+          "label": "Total Views",
+          "value": "50K",
+          "change": "30% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Visits",
+          "value": "12,000",
+          "change": "20% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Orders",
+          "value": "200",
+          "change": "35% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Revenue",
+          "value": "$6,000",
+          "change": "25% YoY",
+          "changeType": "up"
+        }
+      ],
+      "past3Months": [
+        {
+          "label": "Total Views",
+          "value": "120K",
+          "change": "50% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Visits",
+          "value": "30,000",
+          "change": "45% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Orders",
+          "value": "500",
+          "change": "55% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Revenue",
+          "value": "$15,000",
+          "change": "40% YoY",
+          "changeType": "up"
+        }
+      ],
+      "past1Year": [
+        {
+          "label": "Total Views",
+          "value": "500K",
+          "change": "60% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Visits",
+          "value": "120,000",
+          "change": "55% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Orders",
+          "value": "2000",
+          "change": "65% YoY",
+          "changeType": "up"
+        },
+        {
+          "label": "Revenue",
+          "value": "$60,000",
+          "change": "50% YoY",
+          "changeType": "up"
+        }
+      ]
+    },
+    "openOrders": {
+      "past7Days": {
+        "shipWithinWeek": 10
+      },
+      "past1Month": {
+        "shipWithinWeek": 30
+      },
+      "past3Months": {
+        "shipWithinWeek": 90
+      },
+      "past1Year": {
+        "shipWithinWeek": 300
+      }
+    },
+    "listings": {
+      "past7Days": [
+        {
+          "label": "Active listings",
+          "value": "1188"
+        },
+        {
+          "label": "Expired",
+          "value": "547"
+        },
+        {
+          "label": "Sold out",
+          "value": "3470"
+        }
+      ],
+      "past1Month": [
+        {
+          "label": "Active listings",
+          "value": "1200"
+        },
+        {
+          "label": "Expired",
+          "value": "550"
+        },
+        {
+          "label": "Sold out",
+          "value": "3500"
+        }
+      ],
+      "past3Months": [
+        {
+          "label": "Active listings",
+          "value": "1250"
+        },
+        {
+          "label": "Expired",
+          "value": "570"
+        },
+        {
+          "label": "Sold out",
+          "value": "3600"
+        }
+      ],
+      "past1Year": [
+        {
+          "label": "Active listings",
+          "value": "1300"
+        },
+        {
+          "label": "Expired",
+          "value": "600"
+        },
+        {
+          "label": "Sold out",
+          "value": "3800"
+        }
+      ]
+    }
+  }
+  

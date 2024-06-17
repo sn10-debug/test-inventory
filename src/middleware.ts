@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
         req.nextUrl.pathname === '/login/forgotpassword' ||
         req.nextUrl.pathname === '/signup';
     if (pathname === '/') {
-        const destination="/listings";
+        const destination="/dashboard";
         const url=new URL(destination,req.url);
         return NextResponse.rewrite(url);
     }    

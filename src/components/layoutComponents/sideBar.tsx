@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { FiMenu as Icon } from 'react-icons/fi'
 
 export default function Sidebar({ show, setter }: { show: boolean, setter: React.Dispatch<React.SetStateAction<boolean>> }) {
-    const navigation=[{id:1,name:'Listings',route:'/listings'},{id:2,name:'Statistics',route:'/stats'},{id:3,name:'Orders',route:'orders/admin'},{id:4,name:'Sale',route:'/sale'},{id:4,name:'PromoCode',route:'/promoCode'},{id:5,name:'Messages',route:'/messaging/inbox'}]
+    const navigation=[{id:1,name:'Dashboard',route:'/dashboard'},{id:2,name:'Listings',route:'/listings'},{id:3,name:'Statistics',route:'/stats'},{id:4,name:'Orders',route:'orders/admin'},{id:5,name:'Sale',route:'/sale'},{id:6,name:'PromoCode',route:'/promoCode'},{id:7,name:'Messages',route:'/messaging/inbox'}]
     // Define our base class
     const className = "bg-black w-[250px] transition-[margin-left] ease-in-out duration-500 fixed md:static top-0 bottom-0 left-0 z-40";
     // Append class based on state of sidebar visiblity
@@ -38,7 +38,7 @@ export default function Sidebar({ show, setter }: { show: boolean, setter: React
     return (
         <>
             <div className={` ${className}${appendClass}`} style={{position:'fixed'}}>
-                <div className="p-2 flex max-w-screen-xl w-full object-contain items-center justify-center space-x-4">
+                <div className="p-2 flex max-w-screen-xl w-full object-contain px-6 py-4">
                 <button
                 className="text-4xl flex text-white"
                 onClick={() => {
@@ -47,10 +47,7 @@ export default function Sidebar({ show, setter }: { show: boolean, setter: React
             >
                 <Icon />
             </button>
-                    <Link href="/" className='flex justify-center items-center'>
-
-                         <h1 className='text-white text-3xl'>BohoTree</h1>
-                    </Link>
+                   
                 </div>
                 <div className="flex flex-col text-white">
                     {navigation.map((item:any) => (

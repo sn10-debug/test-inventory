@@ -79,7 +79,7 @@ const App = () => {
 
   const fetchAllData = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/v1/listing');
+      const response = await axios.get('http://bohotree.vercel.app/api/v1/listing');
       setCards(response.data);
       setSearchResults(response.data); // Initially, display all data
     } catch (error) {
@@ -89,7 +89,7 @@ const App = () => {
 
   const fetchActiveData = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/v1/listing/active');
+      const response = await axios.get('http://bohotree.vercel.app/api/v1/listing/active');
       setCards(response.data);
       setSearchResults(response.data); // Update search results with active data
     } catch (error) {
@@ -99,7 +99,7 @@ const App = () => {
 
   const fetchDraftData = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/v1/listing/draft');
+      const response = await axios.get('http://bohotree.vercel.app/api/v1/listing/draft');
       setCards(response.data);
       setSearchResults(response.data); // Update search results with draft data
     } catch (error) {

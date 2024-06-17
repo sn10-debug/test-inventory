@@ -10,7 +10,6 @@ import { Label } from '@radix-ui/react-label';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-// Define the Zod schema
 const listingSchema = z.object({
     title: z.string().min(1, 'Title is required'),
     sku: z.string().min(1, 'SKU is required'),
@@ -37,6 +36,7 @@ type ListingData = {
 
 export default function Page({ params }: { params: { listingId: string } }) {
     const [item, setItem] = useState<ListingData | null>(null);
+    const [newFiles, setNewFiles] = useState<File[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -64,6 +64,17 @@ export default function Page({ params }: { params: { listingId: string } }) {
         console.log(data);
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            const filesArray = Array.from(event.target.files);
+            setNewFiles(prevFiles => [...prevFiles, ...filesArray]);
+        }
+    };
+
+    const handleRemove = (index: number) => {
+        setNewFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    };
+
     if (!item) {
         return <div>Listing not found</div>;
     }
@@ -71,30 +82,29 @@ export default function Page({ params }: { params: { listingId: string } }) {
     return (
         <Card className='p-6 shadow-md'>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-                <div className='flex flex-col space-y-2'>
-                    <Label htmlFor="title" className='font-semibold text-gray-700'>Title</Label>
-                    <Input id="title" type="text" defaultValue={item.name} {...register('title')} />
-                    {errors.title && <span className='text-red-500'>{errors.title.message}</span>}
-                </div>
-                <div className='flex flex-col space-y-2'>
-                    <Label htmlFor="sku" className='font-semibold text-gray-700'>SKU</Label>
-                    <Input id="sku" type="text" defaultValue={item.variants[0]?.SKU || ''} {...register('sku')} />
-                    {errors.sku && <span className='text-red-500'>{errors.sku.message}</span>}
-                </div>
-                <div className='flex flex-col space-y-2'>
-                    <Label htmlFor="price" className='font-semibold text-gray-700'>Price</Label>
-                    <Input id="price" type="text" defaultValue={item.commonPrice.toString()} {...register('price')} />
-                    {errors.price && <span className='text-red-500'>{errors.price.message}</span>}
-                </div>
-                <div className='flex flex-col space-y-2'>
-                    <Label htmlFor="priceIndia" className='font-semibold text-gray-700'>Price India</Label>
-                    <Input id="priceIndia" type="text" defaultValue={item.commonPrice.toString()} {...register('priceIndia')} />
-                    {errors.priceIndia && <span className='text-red-500'>{errors.priceIndia.message}</span>}
-                </div>
+
                 <div className='flex flex-col space-y-2'>
                     <Label htmlFor="picture" className='font-semibold text-gray-700'>Picture</Label>
-                    <Input id="picture" type="file" multiple {...register('picture')} />
+                    <Input id="picture" type="file" multiple {...register('picture')} onChange={handleFileChange} />
                     {errors.picture && <span className='text-red-500'>{errors.picture.message}</span>}
+                    <div className="grid grid-cols-4 gap-4 mt-4">
+                        {item.images.map((image, index) => (
+                            <div key={index} className="relative">
+                                <img src={image} alt={`image-${index}`} className="h-24 w-24 object-cover" />
+                                <Button type="button" onClick={() => handleRemove(index)} className="absolute top-0 right-0 bg-red-500 text-white">Remove</Button>
+                            </div>
+                        ))}
+                        {newFiles.map((file, index) => (
+                            <div key={index} className="relative">
+                                {file.type.startsWith("image/") ? (
+                                    <img src={URL.createObjectURL(file)} alt={`new-image-${index}`} className="h-24 w-24 object-cover" />
+                                ) : (
+                                    <video src={URL.createObjectURL(file)} className="h-24 w-24 object-cover" controls />
+                                )}
+                                <Button type="button" onClick={() => handleRemove(index)} className="absolute top-0 right-0 bg-red-500 text-white">Remove</Button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 <Button type="submit" className='w-full'>Save Changes</Button>
             </form>
