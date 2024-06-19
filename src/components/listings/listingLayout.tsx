@@ -11,22 +11,25 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import Spinner from '@/components/ui/spinner'; // Import the spinner component
 
 const CardComponent = ({ title, content, id, image, sku, price, priceIndia, status, variants, draft }: { title: string, content: string, id: string, image: string, sku: string, price: number, priceIndia: number, status: string, variants: { SKU: string }[], draft?: boolean }) => {
   return (
-    <Card className=''>
+    <Card className='flex flex-col justify-between'>
+      <div>
       <Image
         src={image}
         width={500}
         height={500}
         alt="product image"
-        className='w-full h-80 rounded hover:scale-105 object-contain md:object-contain xl:object-fill lg:object-contain'
+        className='w-full h-80 rounded hover:scale-105 md:object-contain md:object-contain xl:object-fill lg:object-contain'
       />
       <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+      </div>
       <CardContent className='space-y-2'>
         <div className='text-gray-500 text-sm'>SKU : {sku}</div>
         <div className='text-gray-500 text-sm'>Price(Indian) : {price} </div>
@@ -70,40 +73,50 @@ const CardComponent = ({ title, content, id, image, sku, price, priceIndia, stat
 
 const App = () => {
   const [cards, setCards] = useState<{
-    draft: any; _id: string, name: string, description: string, images: string[], commonPrice: number, variants: { SKU: string }[] 
+    draft: any; _id: string, name: string, description: string, images: string[], commonPrice: number, variants: { SKU: string }[]
   }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]); // State for search suggestions
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [searchResults, setSearchResults] = useState(cards);
+  const [loading, setLoading] = useState(false); // State for loading
 
   const fetchAllData = async () => {
+    setLoading(true); // Show spinner
     try {
       const response = await axios.get('http://bohotree.vercel.app/api/v1/listing');
       setCards(response.data);
-      setSearchResults(response.data); // Initially, display all data
+      setSearchResults(response.data);
     } catch (error) {
       console.error('Error fetching all data:', error);
+    } finally {
+      setLoading(false); // Hide spinner
     }
   };
 
   const fetchActiveData = async () => {
+    setLoading(true); // Show spinner
     try {
       const response = await axios.get('http://bohotree.vercel.app/api/v1/listing/active');
       setCards(response.data);
-      setSearchResults(response.data); // Update search results with active data
+      setSearchResults(response.data);
     } catch (error) {
       console.error('Error fetching active data:', error);
+    } finally {
+      setLoading(false); // Hide spinner
     }
   };
 
   const fetchDraftData = async () => {
+    setLoading(true); // Show spinner
     try {
       const response = await axios.get('http://bohotree.vercel.app/api/v1/listing/draft');
       setCards(response.data);
-      setSearchResults(response.data); // Update search results with draft data
+      setSearchResults(response.data);
     } catch (error) {
       console.error('Error fetching draft data:', error);
+    } finally {
+      setLoading(false); // Hide spinner
     }
   };
 
@@ -152,41 +165,48 @@ const App = () => {
     <Card>
       <h1 className='p-4 font-bold text-3xl'>Listing Dashboard</h1>
       <div className="flex flex-row justify-center w-full ">
-        <div className="grid w-3/4"> {/* Only display cards after search button click */}
-          {searchResults.length > 0 && (
-            <ScrollArea className='h-[550px] w-full rounded-md'>
-              <div className='max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-col-2 lg:grid-cols-2 xl:grid-cols-3 gap-10 p-4'>
-                {searchResults.map((card) => (
-                  <CardComponent
-                    key={card._id}
-                    id={card._id}
-                    title={card.name}
-                    content={card.description}
-                    image={card.images[0]}
-                    price={card.commonPrice}
-                    priceIndia={card.commonPrice}
-                    sku={card.variants[0]?.SKU || 'N/A'}
-                    status={card.draft ? 'draft' : 'active'}
-                    variants={[]}                  
-                  />
-                ))}
-              </div>
-            </ScrollArea>
+        <div className="grid w-3/4">
+          {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <Spinner /> {/* Show spinner while loading */}
+            </div>
+          ) : (
+            searchResults.length > 0 && (
+              <ScrollArea className='h-[550px] w-full rounded-md'>
+                <div className='max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-col-2 lg:grid-cols-2 xl:grid-cols-3 gap-10 p-4'>
+                  {searchResults.map((card) => (
+                    
+                    <CardComponent
+                      key={card._id}
+                      id={card._id}
+                      title={card.name}
+                      content={card.description}
+                      image={card.images[0]}
+                      price={card.commonPrice}
+                      priceIndia={card.commonPrice}
+                      sku={card.variants[0]?.SKU || 'N/A'}
+                      status={card.draft ? 'draft' : 'active'}
+                      variants={[]}
+                    />
+                    
+                  ))}
+                </div>
+              </ScrollArea>
+            )
           )}
         </div>
         <div className='space-y-4 w-1/4 p-4'>
-          <Link href={"/listings/newListing"}>
-            <Button className=''>Add New Listing</Button>
-          </Link>
-          <div className="flex items-center space-x-2">
+        <Link href={"/listings/newListing"}><Button className="w-full text-[10px] md:text-sm lg:text-sm xl:text-sm">+ New Listing</Button></Link>
+        <div className="flex md:flex-row flex-col gap-2">
+
             <Input
               type="text"
-              placeholder="Search"
+              
               value={searchTerm}
               onChange={handleSearch}
-              list="suggestions" // Link input to datalist
+              list="suggestions"
             />
-            <Button onClick={handleSearchButtonClick}>Search</Button>
+            <Button  onClick={handleSearchButtonClick}><p className='text-[10px] md:text-sm lg:text-sm xl:text-sm"'>Search</p></Button>
           </div>
           <datalist id="suggestions">
             {suggestions.map((suggestion, index) => (
@@ -194,25 +214,26 @@ const App = () => {
             ))}
           </datalist>
           <Card className=''>
-            <CardHeader>
-              <CardTitle>Filter</CardTitle>
+            <CardHeader className='p-2 sm:px-6'>
+              <CardTitle className='text-[10px] sm:text-[15px] md:text-sm lg:text-sm xl:text-sm'>Listing Status</CardTitle>
             </CardHeader>
-            <CardContent className='space-y-2'>
+            <CardContent className='p-2 sm:px-6'>
               <RadioGroup
                 value={selectedStatus}
                 onValueChange={handleStatusChange}
+                className=''
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 text-sm md:text-sm lg:text-sm xl:text-sm">
                   <RadioGroupItem value="">All</RadioGroupItem>
-                  <Label>All</Label>
+                  <Label className='text-[8px] sm:text-sm md:text-sm lg:text-sm xl:text-sm'>All</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="active">Active</RadioGroupItem>
-                  <Label>Active</Label>
+                  <Label className='text-[8px] sm:text-sm md:text-sm lg:text-sm xl:text-sm'>Active</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="draft">Draft</RadioGroupItem>
-                  <Label>Draft</Label>
+                  <Label className='text-[8px] sm:text-sm md:text-sm lg:text-sm xl:text-sm'>Draft</Label>
                 </div>
               </RadioGroup>
             </CardContent>
