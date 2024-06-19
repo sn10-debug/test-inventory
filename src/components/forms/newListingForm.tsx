@@ -9,6 +9,8 @@ import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import {addData} from "../../../actions/actions"
 
 interface FileWithStatus {
   file: File;
@@ -49,6 +51,8 @@ export function NewListingForm() {
         file,
         approved: false,
       }));
+
+
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
@@ -65,20 +69,32 @@ export function NewListingForm() {
     );
   };
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
+    console.log(data)
     const approvedFiles = files.filter((file) => file.approved);
     const formData = new FormData();
-    approvedFiles.forEach((file) => {
-      formData.append("files", file.file);
-    });
+
     
-    // Add other form fields to formData as needed
-    // Submit the formData to your API
+    
+    approvedFiles.forEach((file,i) => {
+      formData.append(`file-${i+1}`, file.file);
+    });
+
+
+    formData.append('numImages',approvedFiles.length.toString());
+    
+
+
+    // Server Action for submitting the form data
+    addData(formData)
+
+
+    
   };
 
   return (
     <div className="space-y-4">
-       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
     <Card className="bg-gray-100">
       <CardContent className="p-8">
         <CardHeader>
