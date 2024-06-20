@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import jsonData from "@/data/componentsData.json";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Textarea } from "../ui/textarea";
@@ -10,7 +9,7 @@ import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import {addData} from "../../../actions/actions"
+import { addData } from "../../../actions/actions";
 
 interface FileWithStatus {
   file: File;
@@ -40,6 +39,7 @@ export function NewListingForm() {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
@@ -52,167 +52,213 @@ export function NewListingForm() {
         approved: false,
       }));
 
-
-      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+      setFiles((prevFiles) => {
+        const updatedFiles = [...prevFiles, ...newFiles];
+        setValue("files", updatedFiles);
+        return updatedFiles;
+      });
     }
   };
 
   const handleRemove = (index: number) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setFiles((prevFiles) => {
+      const updatedFiles = prevFiles.filter((_, i) => i !== index);
+      setValue("files", updatedFiles);
+      return updatedFiles;
+    });
   };
 
   const handleApprove = (index: number) => {
-    setFiles((prevFiles) =>
-      prevFiles.map((file, i) =>
+    setFiles((prevFiles) => {
+      const updatedFiles = prevFiles.map((file, i) =>
         i === index ? { ...file, approved: !file.approved } : file
-      )
-    );
+      );
+      setValue("files", updatedFiles);
+      return updatedFiles;
+    });
   };
 
   const onSubmit = async (data: any) => {
-    console.log(data)
+    console.log("Form data:", data);
     const approvedFiles = files.filter((file) => file.approved);
+    console.log("Approved files:", approvedFiles);
     const formData = new FormData();
-
-    
-    
-    approvedFiles.forEach((file,i) => {
-      formData.append(`file-${i+1}`, file.file);
+  
+    approvedFiles.forEach((file, i) => {
+      formData.append(`file-${i + 1}`, file.file);
     });
-
-
-    formData.append('numImages',approvedFiles.length.toString());
-    
-
-
-    // Server Action for submitting the form data
-    addData(formData)
-
-
-    
+  
+    formData.append("numImages", approvedFiles.length.toString());
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+  
+    // Log formData entries for debugging
+    formData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+  
+    try {
+      const response = await axios.post('/listings/newListing', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      if (response.status === 200) {
+        console.log('Form submitted successfully');
+      }
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+    }
   };
+  
 
   return (
     <div className="space-y-4">
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-    <Card className="bg-gray-100">
-      <CardContent className="p-8">
-        <CardHeader>
-          <CardTitle className="font-bold text-2xl">About</CardTitle>
-          <CardDescription>Tell the world all about your item and why they'll love it.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4" >
-         
-            <div>
-              <div className="space-y-2 mb-2">
-                <CardTitle>Title*</CardTitle>
-                <CardDescription>Include keywords that buyers would use to search for this item.</CardDescription>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <Card className="bg-gray-100">
+          <CardContent className="p-8">
+            <CardHeader>
+              <CardTitle className="font-bold text-2xl">About</CardTitle>
+              <CardDescription>Tell the world all about your item and why they'll love it.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Title*</CardTitle>
+                  <CardDescription>Include keywords that buyers would use to search for this item.</CardDescription>
+                </div>
+                <Textarea placeholder="Enter title" {...register("title")} />
+                {errors.title && <p className="text-red-500">{String(errors.title.message)}</p>}
               </div>
-              <Textarea placeholder="Enter title" {...register("title")} />
-              {errors.title && <p className="text-red-500">{String(errors.title.message)}</p>}
-            </div>
-            <div>
-              <div className="space-y-2 mb-2">
-                <CardTitle>Photo and video*</CardTitle>
-                <CardDescription>Add up to 10 photos and 1 video</CardDescription>
-              </div>
-              <Input
-                type="file"
-                accept="image/*,video/*"
-                multiple
-                onChange={handleFileChange}
-              />
-              {errors.files && <p className="text-red-500">{String(errors.files.message)}</p>}
-              <div className="mt-4 space-y-4">
-                {files.map((fileWithStatus, index) => (
-                  <div key={index} className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      {fileWithStatus.file.type.startsWith("image/") ? (
-                        <img
-                          src={URL.createObjectURL(fileWithStatus.file)}
-                          alt="preview"
-                          className="h-16 w-16 object-cover"
-                        />
-                      ) : (
-                        <video
-                          src={URL.createObjectURL(fileWithStatus.file)}
-                          className="h-16 w-16 object-cover"
-                          controls
-                        />
-                      )}
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Photo and video*</CardTitle>
+                  <CardDescription>Add up to 10 photos and 1 video</CardDescription>
+                </div>
+                <Input
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  onChange={handleFileChange}
+                />
+                {errors.files && <p className="text-red-500">{String(errors.files.message)}</p>}
+                <div className="mt-4 space-y-4">
+                  {files.map((fileWithStatus, index) => (
+                    <div key={index} className="flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        {fileWithStatus.file.type.startsWith("image/") ? (
+                          <img
+                            src={URL.createObjectURL(fileWithStatus.file)}
+                            alt="preview"
+                            className="h-16 w-16 object-cover"
+                          />
+                        ) : (
+                          <video
+                            src={URL.createObjectURL(fileWithStatus.file)}
+                            className="h-16 w-16 object-cover"
+                            controls
+                          />
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={() => handleRemove(index)}
+                        className="bg-red-500 hover:bg-red-700"
+                      >
+                        Remove
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => handleApprove(index)}
+                        className={`${
+                          fileWithStatus.approved
+                            ? "bg-green-500 hover:bg-green-700"
+                            : "bg-gray-500 hover:bg-gray-700"
+                        }`}
+                      >
+                        {fileWithStatus.approved ? "Approved" : "Approve"}
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      onClick={() => handleRemove(index)}
-                      className="bg-red-500 hover:bg-red-700"
-                    >
-                      Remove
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => handleApprove(index)}
-                      className={`${
-                        fileWithStatus.approved
-                          ? "bg-green-500 hover:bg-green-700"
-                          : "bg-gray-500 hover:bg-gray-700"
-                      }`}
-                    >
-                      {fileWithStatus.approved ? "Approved" : "Approve"}
-                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Description*</CardTitle>
+                  <CardDescription>What makes your item special?</CardDescription>
+                </div>
+                <Textarea placeholder="Enter Description" {...register("description")} />
+                {errors.description && <p className="text-red-500">{String(errors.description.message)}</p>}
+              </div>
+            </CardContent>
+          </CardContent>
+        </Card>
+        <Card className="bg-gray-100">
+          <CardContent className="p-8">
+            <CardHeader>
+              <CardTitle className="font-bold text-2xl">Price & Inventory</CardTitle>
+              <CardDescription>Set a price for your item and indicate how many are available for sale</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Price*</CardTitle>
+                </div>
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 ">
+                  <div>
+                    <label>India</label>
+                    <Input placeholder="Enter Price" type="number" />
                   </div>
-                ))}
+                  <div>
+                    <label>Everywhere else</label>
+                    <Input placeholder="Enter Price" type="number" />
+                  </div>
+                </div>
               </div>
-            </div>
-            <div>
               <div className="space-y-2 mb-2">
-                <CardTitle>Description*</CardTitle>
-                <CardDescription>What makes your item special?</CardDescription>
+                <CardTitle>Quantity*</CardTitle>
               </div>
-              <Textarea placeholder="Enter Description" {...register("description")} />
-              {errors.description && <p className="text-red-500">{String(errors.description.message)}</p>}
-            </div>
-           
-          
-        </CardContent>
-      </CardContent>
-    </Card>
-    <Card className="bg-gray-100">
-      <CardContent className="p-8">
-        <CardHeader>
-          <CardTitle className="font-bold text-2xl">Price & Inventory</CardTitle>
-          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
-        </CardHeader>
-        </CardContent >
+              <div className="flex sm:w-2/4 md:w-1/4">
+                <Input placeholder="Enter Quantity" type="number" />
+              </div>
+              <div className="space-y-2 mb-2">
+                <CardTitle>SKU*</CardTitle>
+              </div>
+              <div className="flex sm:w-2/4 md:w-1/4">
+                <Input placeholder="Enter SKU" />
+              </div>
+            </CardContent>
+          </CardContent>
         </Card>
         <Card className="bg-gray-100">
-      <CardContent className="p-8">
-        <CardHeader>
-          <CardTitle className="font-bold text-2xl">Variations</CardTitle>
-          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
-        </CardHeader>
-        </CardContent >
-        </Card>
-    <Card className="bg-gray-100">
-      <CardContent className="p-8">
-        <CardHeader>
-          <CardTitle className="font-bold text-2xl">Detail</CardTitle>
-          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
-        </CardHeader>
-        </CardContent >
+          <CardContent className="p-8">
+            <CardHeader>
+              <CardTitle className="font-bold text-2xl">Variations</CardTitle>
+              <CardDescription>Share a few more specifics about your item to make it easier to find in search, and to help buyers know what to expect.</CardDescription>
+            </CardHeader>
+          </CardContent>
         </Card>
         <Card className="bg-gray-100">
-      <CardContent className="p-8">
-        <CardHeader>
-          <CardTitle className="font-bold text-2xl">Shiping</CardTitle>
-          <CardDescription>Share a few more specifics about your item to make it easier to find in search,and to help buyers know what to expect.</CardDescription>
-        </CardHeader>
-        </CardContent >
+          <CardContent className="p-8">
+            <CardHeader>
+              <CardTitle className="font-bold text-2xl">Detail</CardTitle>
+              <CardDescription>Share a few more specifics about your item to make it easier to find in search, and to help buyers know what to expect.</CardDescription>
+            </CardHeader>
+          </CardContent>
         </Card>
-
+        <Card className="bg-gray-100">
+          <CardContent className="p-8">
+            <CardHeader>
+              <CardTitle className="font-bold text-2xl">Shipping</CardTitle>
+              <CardDescription>Share a few more specifics about your item to make it easier to find in search, and to help buyers know what to expect.</CardDescription>
+            </CardHeader>
+          </CardContent>
+        </Card>
         <Button type="submit" className="w-full mt-4">
-              Submit
-            </Button>
-    </form>
-   </div>
+          Submit
+        </Button>
+      </form>
+    </div>
   );
 }
