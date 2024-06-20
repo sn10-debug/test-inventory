@@ -80,38 +80,28 @@ export function NewListingForm() {
 
   const onSubmit = async (data: any) => {
     console.log("Form data:", data);
-    const approvedFiles = files.filter((file) => file.approved);
+    const approvedFiles = data.files.filter((file: FileWithStatus) => file.approved);
     console.log("Approved files:", approvedFiles);
     const formData = new FormData();
   
-    approvedFiles.forEach((file, i) => {
+    approvedFiles.forEach((file: FileWithStatus, i: number) => {
       formData.append(`file-${i + 1}`, file.file);
     });
   
     formData.append("numImages", approvedFiles.length.toString());
     formData.append("title", data.title);
     formData.append("description", data.description);
-  
-    // Log formData entries for debugging
     formData.forEach((value, key) => {
       console.log(`${key}: ${value}`);
     });
-  
+    
     try {
-      const response = await axios.post('/listings/newListing', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-  
-      if (response.status === 200) {
-        console.log('Form submitted successfully');
-      }
+      const response = await addData(formData);
+      console.log('Form submitted successfully', response);
     } catch (error) {
-      console.error('Error submitting form data:', error);
+      console.error('Error submitting form', error);
     }
   };
-  
 
   return (
     <div className="space-y-4">
