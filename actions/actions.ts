@@ -11,8 +11,6 @@ import ListingSchema from "@/models/ListingSchema"
 
 export const addData=async (data:FormData)=>{
 
-    console.log("Form Submitted")
-    console.log(data.get('title'))
 
     await dbConnect();
 
@@ -23,7 +21,6 @@ export const addData=async (data:FormData)=>{
 
         const file:File | null=data.get(`file-${i+1}`) as File;
 
-        console.log(file)
 
         const bytes=await file.arrayBuffer()
         const buffer=Buffer.from(bytes)

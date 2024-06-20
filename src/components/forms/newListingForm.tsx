@@ -31,6 +31,12 @@ const schema = z.object({
     .refine((files) => files.some((file) => file.approved), {
       message: "At least one approved image is required",
     }),
+    indiaPrice: z.number().min(1, "Price must be at least 1"),
+    everywherePrice: z.number().min(1, "Price must be at least 1"),
+    quantity: z.number().min(1, "Quantity must be at least 1"),
+    sku: z.string().min(1, "SKU must be at least 1"),
+    primaryColour: z.string().min(1, "Primary Colour must be at least 1"),
+    secondaryColour: z.string().min(1, "Secondary Colour must be at least 1"),
 });
 
 export function NewListingForm() {
@@ -79,7 +85,7 @@ export function NewListingForm() {
   };
 
   const onSubmit = async (data: any) => {
-    console.log("Form data:", data);
+
     const approvedFiles = data.files.filter((file: FileWithStatus) => file.approved);
     console.log("Approved files:", approvedFiles);
     const formData = new FormData();
@@ -91,9 +97,12 @@ export function NewListingForm() {
     formData.append("numImages", approvedFiles.length.toString());
     formData.append("title", data.title);
     formData.append("description", data.description);
-    formData.forEach((value, key) => {
-      console.log(`${key}: ${value}`);
-    });
+    formData.append("indiaPrice", data.indiaPrice);
+    formData.append("everywherePrice", data.everywherePrice);
+    formData.append("quantity", data.quantity);
+    formData.append("sku", data.sku);
+    formData.append("primaryColour", data.primaryColour);
+    formData.append("secondaryColour", data.secondaryColour);
     
     try {
       const response = await addData(formData);
@@ -198,11 +207,11 @@ export function NewListingForm() {
                 <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 ">
                   <div>
                     <label>India</label>
-                    <Input placeholder="Enter Price" type="number" />
+                    <Input placeholder="Enter Price"  {...register("indiaPrice")} type="number" />
                   </div>
                   <div>
                     <label>Everywhere else</label>
-                    <Input placeholder="Enter Price" type="number" />
+                    <Input placeholder="Enter Price" {...register("everywherePrice")} type="number" />
                   </div>
                 </div>
               </div>
@@ -210,14 +219,46 @@ export function NewListingForm() {
                 <CardTitle>Quantity*</CardTitle>
               </div>
               <div className="flex sm:w-2/4 md:w-1/4">
-                <Input placeholder="Enter Quantity" type="number" />
+                <Input placeholder="Enter Quantity" {...register("quantity")} type="number" />
               </div>
               <div className="space-y-2 mb-2">
                 <CardTitle>SKU*</CardTitle>
               </div>
               <div className="flex sm:w-2/4 md:w-1/4">
-                <Input placeholder="Enter SKU" />
+                <Input placeholder="Enter SKU"  {...register("sku")}/>
               </div>
+            </CardContent>
+          </CardContent>
+        </Card>
+
+
+        <Card className="bg-gray-100">
+          <CardContent className="p-8">
+            <CardHeader>
+              <CardTitle className="font-bold text-2xl">Colour</CardTitle>
+              <CardDescription>Set the Primary and Secondary Colour for your product</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Primary Colour*</CardTitle>
+                </div>
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 ">
+                  <div>
+                    <Input placeholder="Primary Colour"  {...register("primaryColour")} type="text" />
+                  </div>
+                </div>
+
+                 <div className="space-y-2 my-4 mb-2">
+                  <CardTitle>Secondary Colour</CardTitle>
+                </div>
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 ">
+                  <div>
+                    <Input placeholder="Secondary Colour"  {...register("secondaryColour")} type="text" />
+                  </div>
+                </div>
+              </div>
+              
             </CardContent>
           </CardContent>
         </Card>
