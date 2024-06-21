@@ -16,6 +16,12 @@ const ListingSchema = new Schema({
     type: [String],
     required: [true, "At least one image should be provided"],
   },
+
+  primaryImage:{
+    type:String,
+    required:[true,"Primary Image should be provided"]
+  },
+  
   createdAt: {
     type: Date,
     default: Date.now,
@@ -32,24 +38,26 @@ const ListingSchema = new Schema({
     type: [String],
     required: [true, "Material should be provided"],
   },
-  commonPrice: {
+  priceIndia: {
     type: Number,
     // required: function () {
     //   return this.variantsLabels.length === 0;
     // },
   },
-  commonDiscount: {
+  priceEverywhereElse: {
     type: Number,
     // required: function () {
     //   return this.variantsLabels.length === 0;
     // },
   },
-  commonQuantity: {
+  
+  Discount: {
     type: Number,
     // required: function () {
     //   return this.variantsLabels.length === 0;
     // },
   },
+  
   variationPriceVary: {
     type: Boolean,
     default: false,
@@ -72,45 +80,25 @@ const ListingSchema = new Schema({
       variantName: String,
     },
   ],
-  variants: [
+  variantInfo: [
     {
-      label: {
-        type: String,
-        // Dynamically validate `enum` values
-        // validate: {
-        //   validator: function (value) {
-        //     return this.variantsLabels.some((label) => label.variantName === value);
-        //   },
-        //   message: (props) => `${props.value} is not a valid variant label`,
-        // },
-      },
-      value: String,
-      images: [String],
-      price: {
-        type: Number,
-        // required: function () {
-        //   return this.variationPriceVary;
-        // },
-      },
-      quantity: {
-        type: Number,
-        // required: function () {
-        //   return this.variationQuantityVary;
-        // },
-      },
-      SKU: {
-        type: String,
-        // required: function () {
-        //   return this.variationSKUVary;
-        // },
-      },
-      discount: {
-        type: Number,
-        // required: function () {
-        //   return this.variationDiscountVary;
-        // },
-      },
-    },
+
+      type:{
+
+      label:String,
+      variants:[{
+        type:{
+          value:String,
+          image:String,
+          priceIndia:Number,
+          priceEverywhereElse:Number,
+          quantity:Number,
+          SKU:String
+        }
+      }]
+      
+    }
+  }
   ],
   reviews: [
     {
@@ -138,6 +126,17 @@ const ListingSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  returnable: {
+    type: Boolean,
+    default: false,
+  },
+  occassion:{
+    type: [String],
+  },
+  category:{
+    type:String,
+  }
+  
 });
 
 ListingSchema.pre("save", function (next) {
