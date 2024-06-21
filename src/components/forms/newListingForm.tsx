@@ -8,9 +8,8 @@ import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { addData } from "../../../actions/actions";
-
+import { Switch } from "@/components/ui/switch";
 interface FileWithStatus {
   file: File;
   approved: boolean;
@@ -31,16 +30,35 @@ const schema = z.object({
     .refine((files) => files.some((file) => file.approved), {
       message: "At least one approved image is required",
     }),
-    indiaPrice: z.number().min(1, "Price must be at least 1"),
-    everywherePrice: z.number().min(1, "Price must be at least 1"),
-    quantity: z.number().min(1, "Quantity must be at least 1"),
-    sku: z.string().min(1, "SKU must be at least 1"),
-    primaryColour: z.string().min(1, "Primary Colour must be at least 1"),
-    secondaryColour: z.string().min(1, "Secondary Colour must be at least 1"),
+  indiaPrice: z.number().min(1, "Price required"),
+  everywherePrice: z.number().min(1, "Price required"),
+  quantity: z.number().min(1, "Quantity must be at least 1"),
+  sku: z.string().min(1, "SKU required"),
+  category: z.string().min(1, "Category required"),
+  tags: z.array(z.string()),
+  material: z.array(z.string()),
 });
 
 export function NewListingForm() {
   const [files, setFiles] = useState<FileWithStatus[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [variations, setVariations] = useState<{
+    type: string;
+    values: { value: string; image: FileWithStatus | null; price: string; quantity: string; sku: string; }[];
+    images: boolean;
+    prices: boolean;
+    quantity: boolean;
+    skus: boolean;
+  }[]>([]);
+  const [newVariation, setNewVariation] = useState({
+    type: "",
+    values: [] as { value: string; image: FileWithStatus | null; price: string; quantity: string; sku: string; }[],
+    images: false,
+    prices: false,
+    quantity: false,
+    skus: false,
+  });
+
   const {
     register,
     handleSubmit,
@@ -84,26 +102,94 @@ export function NewListingForm() {
     });
   };
 
-  const onSubmit = async (data: any) => {
+  const handleAddVariation = () => {
+    setShowModal(true);
+  };
 
-    const approvedFiles = data.files.filter((file: FileWithStatus) => file.approved);
+  const handleVariationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewVariation((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddVariationValue = () => {
+    setNewVariation((prev) => ({
+      ...prev,
+      values: [...prev.values, { value: "", image: null, price: "", quantity: "", sku: "" }],
+    }));
+  };
+
+  const handleVariationValueChange = (
+    index: number,
+    key: keyof typeof newVariation.values[0],
+    value: string | FileWithStatus
+  ) => {
+    setNewVariation((prev) => {
+      const updatedValues = [...prev.values];
+      updatedValues[index] = {
+        ...updatedValues[index],
+        [key]: value,
+      };
+      return { ...prev, values: updatedValues };
+    });
+  };
+  
+
+  const handleRemoveVariationValue = (index: number) => {
+    setNewVariation((prev) => {
+      const updatedValues = prev.values.filter((_, i) => i !== index);
+      return { ...prev, values: updatedValues };
+    });
+  };
+
+  const handleToggle = (key: keyof typeof newVariation) => {
+    setNewVariation((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleDone = () => {
+    setVariations((prev) => [...prev, newVariation]);
+    setNewVariation({ type: "", values: [], images: false, prices: false, quantity: false, skus: false });
+    setShowModal(false);
+  };
+
+  const handleFileUploadForValue = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    if (event.target.files) {
+      const file = event.target.files[0];
+      const fileWithStatus = { file, approved: false };
+      handleVariationValueChange(index, 'image', fileWithStatus);
+    }
+  };
+
+  const handleEditVariation = (index: number) => {
+    setNewVariation(variations[index]);
+    setShowModal(true);
+    handleRemoveVariation(index);
+  };
+
+  const handleRemoveVariation = (index: number) => {
+    setVariations((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const onSubmit = async (data:any) => {
+    const approvedFiles = data.files.filter((file:FileWithStatus) => file.approved);
     console.log("Approved files:", approvedFiles);
     const formData = new FormData();
-  
+
     approvedFiles.forEach((file: FileWithStatus, i: number) => {
       formData.append(`file-${i + 1}`, file.file);
     });
-  
+
     formData.append("numImages", approvedFiles.length.toString());
     formData.append("title", data.title);
     formData.append("description", data.description);
-    formData.append("indiaPrice", data.indiaPrice);
-    formData.append("everywherePrice", data.everywherePrice);
-    formData.append("quantity", data.quantity);
+    formData.append("indiaPrice", data.indiaPrice.toString());
+    formData.append("everywherePrice", data.everywherePrice.toString());
+    formData.append("quantity", data.quantity.toString());
     formData.append("sku", data.sku);
-    formData.append("primaryColour", data.primaryColour);
-    formData.append("secondaryColour", data.secondaryColour);
-    
+    formData.append("category", data.category);
+    formData.append("tags", data.tags);
+    formData.append("material", data.material);
+
+
     try {
       const response = await addData(formData);
       console.log('Form submitted successfully', response);
@@ -193,6 +279,7 @@ export function NewListingForm() {
             </CardContent>
           </CardContent>
         </Card>
+
         <Card className="bg-gray-100">
           <CardContent className="p-8">
             <CardHeader>
@@ -218,56 +305,52 @@ export function NewListingForm() {
               <div className="space-y-2 mb-2">
                 <CardTitle>Quantity*</CardTitle>
               </div>
-              <div className="flex sm:w-2/4 md:w-1/4">
-                <Input placeholder="Enter Quantity" {...register("quantity")} type="number" />
-              </div>
-              <div className="space-y-2 mb-2">
-                <CardTitle>SKU*</CardTitle>
-              </div>
-              <div className="flex sm:w-2/4 md:w-1/4">
-                <Input placeholder="Enter SKU"  {...register("sku")}/>
-              </div>
-            </CardContent>
-          </CardContent>
-        </Card>
-
-
-        <Card className="bg-gray-100">
-          <CardContent className="p-8">
-            <CardHeader>
-              <CardTitle className="font-bold text-2xl">Colour</CardTitle>
-              <CardDescription>Set the Primary and Secondary Colour for your product</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
               <div>
-                <div className="space-y-2 mb-2">
-                  <CardTitle>Primary Colour*</CardTitle>
-                </div>
-                <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 ">
-                  <div>
-                    <Input placeholder="Primary Colour"  {...register("primaryColour")} type="text" />
-                  </div>
-                </div>
-
-                 <div className="space-y-2 my-4 mb-2">
-                  <CardTitle>Secondary Colour</CardTitle>
-                </div>
-                <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 ">
-                  <div>
-                    <Input placeholder="Secondary Colour"  {...register("secondaryColour")} type="text" />
-                  </div>
-                </div>
+                <Label htmlFor="quantity">Quantity*</Label>
+                <Input type="number" placeholder="Enter Quantity" {...register("quantity", { valueAsNumber: true })} />
+                {errors.quantity && <p className="text-red-500">{String(errors.quantity.message)}</p>}
               </div>
-              
+              <div>
+                <Label htmlFor="sku">SKU (Stock Keeping Unit)*</Label>
+                <Input type="text" placeholder="Enter SKU" {...register("sku")} />
+                {errors.sku && <p className="text-red-500">{String(errors.sku.message)}</p>}
+              </div>
             </CardContent>
           </CardContent>
         </Card>
+
         <Card className="bg-gray-100">
           <CardContent className="p-8">
             <CardHeader>
               <CardTitle className="font-bold text-2xl">Variations</CardTitle>
-              <CardDescription>Share a few more specifics about your item to make it easier to find in search, and to help buyers know what to expect.</CardDescription>
+              <CardDescription>Manage variations like color, size, etc.</CardDescription>
             </CardHeader>
+            <CardContent className="space-y-4">
+              {variations.map((variation, index) => (
+                <div key={index} className="border p-4 rounded-md">
+                  <div className="flex justify-between">
+                    <CardTitle>{variation.type}</CardTitle>
+                    <div className="space-x-2">
+                      <Button variant="outline" type="button" onClick={() => handleEditVariation(index)}>Edit</Button>
+                      <Button variant="outline" type="button" onClick={() => handleRemoveVariation(index)}>Remove</Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2 mt-2">
+                    {variation.values.map((value, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <p>{value.value}</p>
+                        {variation.images && value.image && <img src={URL.createObjectURL(value.image.file)} alt="Variation" className="h-10 w-10 object-cover" />}
+                        {variation.prices && <p>Price: {value.price}</p>}
+                        {variation.quantity && <p>Quantity: {value.quantity}</p>}
+                        {variation.skus && <p>SKU: {value.sku}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <Button type="button" onClick={handleAddVariation}>Add Variation</Button>
+            </CardContent>
           </CardContent>
         </Card>
         <Card className="bg-gray-100">
@@ -276,20 +359,104 @@ export function NewListingForm() {
               <CardTitle className="font-bold text-2xl">Detail</CardTitle>
               <CardDescription>Share a few more specifics about your item to make it easier to find in search, and to help buyers know what to expect.</CardDescription>
             </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Category*</CardTitle>
+                </div>
+                <Input placeholder="Search for a category eg:- Trims & Laces, Fabrics, Appliqué..." {...register("category")} />
+                {errors.category && <p className="text-red-500">{String(errors.category.message)}</p>}
+              </div>
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Tags</CardTitle>
+                </div>
+                <Textarea placeholder="shape, style, color, function etc." {...register("tags")} />
+              </div>
+              <div>
+                <div className="space-y-2 mb-2">
+                  <CardTitle>Material</CardTitle>
+                </div>
+                <Textarea placeholder="Ingridients, components etc." {...register("material")} />
+              </div>
+            </CardContent>
           </CardContent>
         </Card>
         <Card className="bg-gray-100">
           <CardContent className="p-8">
             <CardHeader>
-              <CardTitle className="font-bold text-2xl">Shipping</CardTitle>
-              <CardDescription>Share a few more specifics about your item to make it easier to find in search, and to help buyers know what to expect.</CardDescription>
+              <CardTitle className="font-bold text-2xl">Settings</CardTitle>
+              <CardDescription>Choose how this listing will display in your shop, how will renew, and if you want it to be promoted in Etsy Ads.</CardDescription>
             </CardHeader>
+            <CardContent className="space-y-8">
+              <div className="flex space-x-4">
+                  <CardTitle>Featured Listing</CardTitle>
+                <Switch />
+              </div>
+              <div className="flex space-x-4">
+                  <CardTitle>Return available</CardTitle>
+                <Switch />
+              </div>
+            </CardContent>
           </CardContent>
-        </Card>
-        <Button type="submit" className="w-full mt-4">
-          Submit
-        </Button>
+          </Card>
+       
+        <div className="flex justify-end">
+          <Button type="submit">Submit</Button>
+        </div>
       </form>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-md space-y-4">
+            <h2 className="text-xl font-bold">Add Variation</h2>
+            <Input placeholder="Variation Type" value={newVariation.type} name="type" onChange={handleVariationChange} />
+            <Button type="button" onClick={handleAddVariationValue}>Add Value</Button>
+
+            <div className="mt-4 space-y-4">
+              {newVariation.values.map((value, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Input placeholder="Value" value={value.value} onChange={(e) => handleVariationValueChange(index, "value", e.target.value)} />
+                  {newVariation.images && (
+                    <Input type="file" accept="image/*" onChange={(e) => handleFileUploadForValue(e, index)} />
+                  )}
+                  {newVariation.prices && (
+                    <Input type="number" placeholder="Price" value={value.price} onChange={(e) => handleVariationValueChange(index, "price", e.target.value)} />
+                  )}
+                  {newVariation.quantity && (
+                    <Input type="number" placeholder="Quantity" value={value.quantity} onChange={(e) => handleVariationValueChange(index, "quantity", e.target.value)} />
+                  )}
+                  {newVariation.skus && (
+                    <Input type="text" placeholder="SKU" value={value.sku} onChange={(e) => handleVariationValueChange(index, "sku", e.target.value)} />
+                  )}
+                  <Button variant="outline" type="button" onClick={() => handleRemoveVariationValue(index)}>Remove</Button>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex space-x-4">
+              <Button variant="outline" type="button" onClick={() => handleToggle('images')}>
+                {newVariation.images ? 'Disable Images' : 'Enable Images'}
+              </Button>
+              <Button variant="outline" type="button" onClick={() => handleToggle('prices')}>
+                {newVariation.prices ? 'Disable Prices' : 'Enable Prices'}
+              </Button>
+              <Button variant="outline" type="button" onClick={() => handleToggle('quantity')}>
+                {newVariation.quantity ? 'Disable Quantity' : 'Enable Quantity'}
+              </Button>
+              <Button variant="outline" type="button" onClick={() => handleToggle('skus')}>
+                {newVariation.skus ? 'Disable SKUs' : 'Enable SKUs'}
+              </Button>
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <Button type="button" onClick={() => setShowModal(false)}>Cancel</Button>
+              <Button type="button" onClick={handleDone}>Done</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </div>
   );
 }
