@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 interface FileWithStatus {
   file: File;
   approved: boolean;
+  primary:boolean;
 }
 
 // Define the Zod schema
@@ -37,6 +38,8 @@ const schema = z.object({
   category: z.string().min(1, "Category required"),
   tags: z.array(z.string()),
   material: z.array(z.string()),
+  indiaDiscount:z.number().min(0,"Discount should be greater than 0"),
+  everywhereElseDiscount:z.number().min(0,"Discount should be greater than 0")
 });
 
 export function NewListingForm() {
@@ -58,6 +61,8 @@ export function NewListingForm() {
     quantity: false,
     skus: false,
   });
+
+  const [primaryImage,setPrimaryImage]=useState<FileWithStatus | null>(null); 
 
   const {
     register,
@@ -169,14 +174,42 @@ export function NewListingForm() {
     setVariations((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handlePrimary=(index:Number)=>{
+
+    if(primaryImage){
+      setPrimaryImage(null);
+    }
+    setFiles((prevFiles) => {
+      const updatedFiles = prevFiles.map((file, i) =>
+
+
+        {
+        if (i === index) {
+          
+          if(!file.primary) setPrimaryImage({ ...file, primary: !file.primary })
+          
+          return{ ...file, primary: !file.primary } }
+          
+          else return file
+        }
+      );
+      setValue("files", updatedFiles);
+      return updatedFiles;
+    });
+  }
+
   const onSubmit = async (data:any) => {
     const approvedFiles = data.files.filter((file:FileWithStatus) => file.approved);
+    const primaryFile = data.files.find((file:FileWithStatus) => file.primary);
     console.log("Approved files:", approvedFiles);
     const formData = new FormData();
 
     approvedFiles.forEach((file: FileWithStatus, i: number) => {
       formData.append(`file-${i + 1}`, file.file);
     });
+
+
+    formData.append("primaryImage", primaryFile?.file);
 
     formData.append("numImages", approvedFiles.length.toString());
     formData.append("title", data.title);
@@ -188,6 +221,8 @@ export function NewListingForm() {
     formData.append("category", data.category);
     formData.append("tags", data.tags);
     formData.append("material", data.material);
+    formData.append("indiaDiscount",data.indiaDiscount.toString());
+    formData.append("everywhereElseDiscount",data.everywhereElseDiscount.toString());
 
 
     try {
@@ -264,6 +299,18 @@ export function NewListingForm() {
                       >
                         {fileWithStatus.approved ? "Approved" : "Approve"}
                       </Button>
+                        {fileWithStatus.approved && (!primaryImage ? !primaryImage : fileWithStatus.primary) ?
+                      <Button
+                        type="button"
+                        onClick={() => handlePrimary(index)}
+                        className={`${
+                          !fileWithStatus.primary
+                            ? "bg-green-500 hover:bg-green-700"
+                            : "bg-gray-500 hover:bg-gray-700"
+                        }`}
+                      >
+                        { fileWithStatus.primary ? "Remove as Primary" : "Make Primary" }
+                      </Button> : ""}
                     </div>
                   ))}
                 </div>
@@ -300,6 +347,15 @@ export function NewListingForm() {
                     <label>Everywhere else</label>
                     <Input placeholder="Enter Price" {...register("everywherePrice")} type="number" />
                   </div>
+                  <div>
+                    <label>India Discount</label>
+                    <Input placeholder="Enter India Discount"  {...register("indiaDiscount")} type="number" />
+                  </div>
+
+                  <div>
+                    <label>Everywhere else Discount</label>
+                    <Input placeholder="Enter other Countries Discount"  {...register("everywhereElseDiscount")} type="number" />
+                  </div>    
                 </div>
               </div>
               <div className="space-y-2 mb-2">

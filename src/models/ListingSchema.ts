@@ -43,21 +43,30 @@ const ListingSchema = new Schema({
     // required: function () {
     //   return this.variantsLabels.length === 0;
     // },
+    required:[true,"Price for India should be Provided"]
   },
   priceEverywhereElse: {
     type: Number,
     // required: function () {
     //   return this.variantsLabels.length === 0;
     // },
+    required:[true,"Price for countries other than India Should be Provided"]
   },
   
-  Discount: {
+  indiaDiscount: {
     type: Number,
     // required: function () {
     //   return this.variantsLabels.length === 0;
     // },
+    default:0
   },
-  
+  everywhereElseDiscount: {
+    type: Number,
+    // required: function () {
+    //   return this.variantsLabels.length === 0;
+    // },
+    default:0
+  },
   variationPriceVary: {
     type: Boolean,
     default: false,
@@ -105,6 +114,7 @@ const ListingSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: "Review",
     },
+
   ],
   views: {
     type: Number,
@@ -132,9 +142,19 @@ const ListingSchema = new Schema({
   },
   occassion:{
     type: [String],
+    default:[]
   },
   category:{
     type:String,
+  },
+  featured:{
+    type:Boolean,
+    default:false
+  
+  },
+  featuredCategory:{
+    type:String,
+    default:''
   }
   
 });
