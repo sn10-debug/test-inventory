@@ -10,6 +10,15 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addData } from "../../../actions/actions";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 interface FileWithStatus {
   file: File;
   approved: boolean;
@@ -79,8 +88,9 @@ export function NewListingForm() {
       const newFiles = Array.from(event.target.files).map((file) => ({
         file,
         approved: false,
+        primary: false,
       }));
-
+  
       setFiles((prevFiles) => {
         const updatedFiles = [...prevFiles, ...newFiles];
         setValue("files", updatedFiles);
@@ -159,7 +169,7 @@ export function NewListingForm() {
   const handleFileUploadForValue = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     if (event.target.files) {
       const file = event.target.files[0];
-      const fileWithStatus = { file, approved: false };
+      const fileWithStatus = { file, approved: false, primary: false };
       handleVariationValueChange(index, 'image', fileWithStatus);
     }
   };
@@ -223,7 +233,7 @@ export function NewListingForm() {
     formData.append("material", data.material);
     formData.append("indiaDiscount",data.indiaDiscount.toString());
     formData.append("everywhereElseDiscount",data.everywhereElseDiscount.toString());
-
+    console.log("Form data:", formData);
 
     try {
       const response = await addData(formData);
@@ -416,11 +426,24 @@ export function NewListingForm() {
               <CardDescription>Share a few more specifics about your item to make it easier to find in search, and to help buyers know what to expect.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
+              <div >
                 <div className="space-y-2 mb-2">
                   <CardTitle>Category*</CardTitle>
                 </div>
-                <Input placeholder="Search for a category eg:- Trims & Laces, Fabrics, Appliqué..." {...register("category")} />
+                <Select>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Category</SelectLabel>
+                      <SelectItem value="Trims & Laces"> Trims & Laces</SelectItem>
+                      <SelectItem value="Fabrics">Fabrics</SelectItem>
+                      <SelectItem value="Appliqué">Appliqué</SelectItem>
+                      <SelectItem value="Tassels & Latkans">Tassels & Latkans</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
                 {errors.category && <p className="text-red-500">{String(errors.category.message)}</p>}
               </div>
               <div>
@@ -442,7 +465,7 @@ export function NewListingForm() {
           <CardContent className="p-8">
             <CardHeader>
               <CardTitle className="font-bold text-2xl">Settings</CardTitle>
-              <CardDescription>Choose how this listing will display in your shop, how will renew, and if you want it to be promoted in Etsy Ads.</CardDescription>
+              <CardDescription>Choose how this listing will display in your shop</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="flex space-x-4">
@@ -453,6 +476,25 @@ export function NewListingForm() {
                   <CardTitle>Return available</CardTitle>
                 <Switch />
               </div>
+              <div className="flex flex-row items-center space-x-4">
+                <div >
+                  <CardTitle>Occassion</CardTitle>
+                </div>             
+                <Select>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select occassion" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Occassion</SelectLabel>
+                      <SelectItem value="Trims & Laces">Diwali</SelectItem>
+                      <SelectItem value="Fabrics">Christmas</SelectItem>
+                      <SelectItem value="Appliqué">St. patricks day</SelectItem>
+                      <SelectItem value="Tassels & Latkans">Holi</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                </div>
             </CardContent>
           </CardContent>
           </Card>
