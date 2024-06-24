@@ -59,6 +59,7 @@ const schema = z.object({
   indiaDiscount:z.string().min(0,"Discount should be greater than 0"),
   everywhereElseDiscount:z.string().min(0,"Discount should be greater than 0"),
   category:z.enum(["Trims & Laces","Fabrics","Appliqué","Tassels & Latkans"]),
+  occassion:z.enum(["Diwali","Christmas","St. patricks day","Holi",""]).nullish(),
 });
 
 type FormFields = z.infer<typeof schema>;
@@ -248,13 +249,14 @@ export function NewListingForm() {
     formData.append("quantity", data.quantity.toString());
     formData.append("sku", data.sku);
     formData.append("category", data.category);
-    formData.append("tags", data.tags);
-    formData.append("material", data.material);
+    formData.append("tags", JSON.stringify(data.tags.split(",")));
+    formData.append("material", JSON.stringify(data.material.split(",")));
     formData.append("indiaDiscount",data.indiaDiscount.toString());
     formData.append("everywhereElseDiscount",data.everywhereElseDiscount.toString());
     formData.append("variations",JSON.stringify(variations))
     formData.append("featured",featured.toString());
     formData.append("returnable",returnListing.toString());
+    formData.append("occassion",data.occassion);
     console.log("Form data:", formData);
 
     try {
@@ -513,20 +515,17 @@ export function NewListingForm() {
                 <div >
                   <CardTitle>Occassion</CardTitle>
                 </div>             
-                <Select>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select occassion" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Occassion</SelectLabel>
-                      <SelectItem value="Trims & Laces">Diwali</SelectItem>
-                      <SelectItem value="Fabrics">Christmas</SelectItem>
-                      <SelectItem value="Appliqué">St. patricks day</SelectItem>
-                      <SelectItem value="Tassels & Latkans">Holi</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+              
+
+
+                <select {...register("occassion")} className="block px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm appearance-none">
+        
+             <option value={""} defaultChecked={true}>Select a Occasion</option>
+            <option value={"Diwali"}>Diwali</option>
+            <option value={"Christmas"}>Christmas</option>
+            <option value={"St. patricks day"}>St. patricks day</option>
+            <option value={"Holi"}>Holi</option>
+            </select>
                 </div>
             </CardContent>
           </CardContent>
