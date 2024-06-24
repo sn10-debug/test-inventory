@@ -19,6 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form"
 interface FileWithStatus {
   file: File;
   approved: boolean;
@@ -40,16 +50,18 @@ const schema = z.object({
     .refine((files) => files.some((file) => file.approved), {
       message: "At least one approved image is required",
     }),
-  indiaPrice: z.number().min(1, "Price required"),
-  everywherePrice: z.number().min(1, "Price required"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
+  indiaPrice: z.string().min(1, "Price must be greater than 0"),
+  everywherePrice: z.string().min(1, "Price must be greater than 0"),
+  quantity: z.string().min(1, "Quantity must be greater than 0"),
   sku: z.string().min(1, "SKU required"),
-  category: z.string().min(1, "Category required"),
-  tags: z.array(z.string()),
-  material: z.array(z.string()),
-  indiaDiscount:z.number().min(0,"Discount should be greater than 0"),
-  everywhereElseDiscount:z.number().min(0,"Discount should be greater than 0")
+  tags: (z.string().refine((tags) => tags.split(",").length > 0, { message: "At least one tag is required" })),
+  material: (z.string().refine((material) => material.split(",").length > 0, { message: "At least one material is required" })),
+  indiaDiscount:z.string().min(0,"Discount should be greater than 0"),
+  everywhereElseDiscount:z.string().min(0,"Discount should be greater than 0"),
+  category:z.enum(["Trims & Laces","Fabrics","Appliqué","Tassels & Latkans"]),
 });
+
+type FormFields = z.infer<typeof schema>;
 
 export function NewListingForm() {
   const [files, setFiles] = useState<FileWithStatus[]>([]);
@@ -72,14 +84,17 @@ export function NewListingForm() {
   });
 
   const [primaryImage,setPrimaryImage]=useState<FileWithStatus | null>(null); 
+  const [category,setCategory]=useState<string>("");
+  const [featured,setFeatured]=useState<boolean>(false);
+  const [returnListing,setReturnListing] =useState<boolean>(false);
 
   const {
     register,
     handleSubmit,
     control,
     setValue,
-    formState: { errors },
-  } = useForm({
+    formState: { errors,isSubmitting},
+  } = useForm<FormFields>({
     resolver: zodResolver(schema),
   });
 
@@ -209,9 +224,10 @@ export function NewListingForm() {
   }
 
   const onSubmit = async (data:any) => {
+    
+
     const approvedFiles = data.files.filter((file:FileWithStatus) => file.approved);
     const primaryFile = data.files.find((file:FileWithStatus) => file.primary);
-    console.log("Approved files:", approvedFiles);
     const formData = new FormData();
 
     approvedFiles.forEach((file: FileWithStatus, i: number) => {
@@ -219,8 +235,11 @@ export function NewListingForm() {
     });
 
 
-    formData.append("primaryImage", primaryFile?.file);
+    console.log("Variations:", variations)
 
+
+    formData.append("primaryImage", primaryFile?.file);
+    formData.append("category",category);
     formData.append("numImages", approvedFiles.length.toString());
     formData.append("title", data.title);
     formData.append("description", data.description);
@@ -233,6 +252,9 @@ export function NewListingForm() {
     formData.append("material", data.material);
     formData.append("indiaDiscount",data.indiaDiscount.toString());
     formData.append("everywhereElseDiscount",data.everywhereElseDiscount.toString());
+    formData.append("variations",JSON.stringify(variations))
+    formData.append("featured",featured.toString());
+    formData.append("returnable",returnListing.toString());
     console.log("Form data:", formData);
 
     try {
@@ -242,6 +264,7 @@ export function NewListingForm() {
       console.error('Error submitting form', error);
     }
   };
+
 
   return (
     <div className="space-y-4">
@@ -351,20 +374,28 @@ export function NewListingForm() {
                 <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 ">
                   <div>
                     <label>India</label>
-                    <Input placeholder="Enter Price"  {...register("indiaPrice")} type="number" />
+                    <Input placeholder="0"   {...register("indiaPrice")} type="number" />
+                    {errors.indiaPrice && <p className="text-red-500">{String(errors.indiaPrice.message)}</p>}
+
                   </div>
                   <div>
                     <label>Everywhere else</label>
-                    <Input placeholder="Enter Price" {...register("everywherePrice")} type="number" />
+                    <Input placeholder="0" {...register("everywherePrice")} type="number" />
+                    {errors.everywherePrice && <p className="text-red-500">{String(errors.everywherePrice.message)}</p>}
+
                   </div>
                   <div>
                     <label>India Discount</label>
-                    <Input placeholder="Enter India Discount"  {...register("indiaDiscount")} type="number" />
+                    <Input placeholder="Enter India Discount"  {...register("indiaDiscount")} type="number" />  
+                    {errors.indiaDiscount && <p className="text-red-500">{String(errors.indiaDiscount.message)}</p>}
+
                   </div>
 
                   <div>
                     <label>Everywhere else Discount</label>
                     <Input placeholder="Enter other Countries Discount"  {...register("everywhereElseDiscount")} type="number" />
+                    {errors.everywhereElseDiscount && <p className="text-red-500">{String(errors.everywhereElseDiscount.message)}</p>}
+
                   </div>    
                 </div>
               </div>
@@ -373,7 +404,7 @@ export function NewListingForm() {
               </div>
               <div>
                 <Label htmlFor="quantity">Quantity*</Label>
-                <Input type="number" placeholder="Enter Quantity" {...register("quantity", { valueAsNumber: true })} />
+                <Input placeholder="Enter Quantity" {...register("quantity")} type="number" />
                 {errors.quantity && <p className="text-red-500">{String(errors.quantity.message)}</p>}
               </div>
               <div>
@@ -430,21 +461,17 @@ export function NewListingForm() {
                 <div className="space-y-2 mb-2">
                   <CardTitle>Category*</CardTitle>
                 </div>
-                <Select>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Category</SelectLabel>
-                      <SelectItem value="Trims & Laces"> Trims & Laces</SelectItem>
-                      <SelectItem value="Fabrics">Fabrics</SelectItem>
-                      <SelectItem value="Appliqué">Appliqué</SelectItem>
-                      <SelectItem value="Tassels & Latkans">Tassels & Latkans</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                {errors.category && <p className="text-red-500">{String(errors.category.message)}</p>}
+               
+
+<select {...register("category")} className="block px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm appearance-none">
+        
+         <option value={" "} defaultChecked={true}>Select a Category</option>
+        <option value={"Appliqué"}>Appliqué</option>
+        <option value={"Trims & Laces"}>Trims & Laces </option>
+        <option value={"Fabrics"}>Fabrics</option>
+        <option value={"Tassels & Latkans"}>Tassels & Latkans</option>
+      </select>
+      {errors.category && <p className="text-red-500">{String(errors.category.message)}</p>}
               </div>
               <div>
                 <div className="space-y-2 mb-2">
@@ -470,12 +497,18 @@ export function NewListingForm() {
             <CardContent className="space-y-8">
               <div className="flex space-x-4">
                   <CardTitle>Featured Listing</CardTitle>
-                <Switch />
+                <Switch checked={featured} onCheckedChange={(val:boolean)=>{
+                  setFeatured(val);
+                }} />
               </div>
               <div className="flex space-x-4">
                   <CardTitle>Return available</CardTitle>
-                <Switch />
+                <Switch checked={returnListing} onCheckedChange={(val:boolean)=>{
+                  setReturnListing(val);
+                }} />
               </div>
+
+              
               <div className="flex flex-row items-center space-x-4">
                 <div >
                   <CardTitle>Occassion</CardTitle>
@@ -500,7 +533,7 @@ export function NewListingForm() {
           </Card>
        
         <div className="flex justify-end">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Loading..." :"Submit"}</Button>
         </div>
       </form>
 
