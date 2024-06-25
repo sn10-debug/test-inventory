@@ -531,7 +531,8 @@ export function NewListingForm() {
           </CardContent>
           </Card>
        
-        <div className="flex justify-end">
+        <div className="flex justify-end space-x-4">
+          <Button variant={'outline'}>Save as Draft</Button>
           <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Loading..." :"Submit"}</Button>
         </div>
       </form>
