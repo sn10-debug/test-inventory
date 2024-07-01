@@ -88,6 +88,7 @@ export function NewListingForm() {
   const [category,setCategory]=useState<string>("");
   const [featured,setFeatured]=useState<boolean>(false);
   const [returnListing,setReturnListing] =useState<boolean>(false);
+  const [approvedImages, setApprovedImages] = useState<FileWithStatus[]>([]);
 
   const {
     register,
@@ -129,10 +130,14 @@ export function NewListingForm() {
         i === index ? { ...file, approved: !file.approved } : file
       );
       setValue("files", updatedFiles);
+      
+      // Update approvedImages
+      const newApprovedImages = updatedFiles.filter(file => file.approved);
+      setApprovedImages(newApprovedImages);
+      
       return updatedFiles;
     });
   };
-
   const handleAddVariation = () => {
     setShowModal(true);
   };
@@ -438,7 +443,13 @@ export function NewListingForm() {
                     {variation.values.map((value, i) => (
                       <div key={i} className="flex items-center justify-between">
                         <p>{value.value}</p>
-                        {variation.images && value.image && <img src={URL.createObjectURL(value.image.file)} alt="Variation" className="h-10 w-10 object-cover" />}
+                        {variation.images && value.image && (
+                              <img 
+                                src={URL.createObjectURL(value.image.file)} 
+                                alt="Variation" 
+                                className="h-10 w-10 object-cover" 
+                              />
+                            )}                        
                         {variation.prices && <p>Price: {value.price}</p>}
                         {variation.quantity && <p>Quantity: {value.quantity}</p>}
                         {variation.skus && <p>SKU: {value.sku}</p>}
@@ -549,8 +560,19 @@ export function NewListingForm() {
                 <div key={index} className="flex items-center space-x-2">
                   <Input placeholder="Value" value={value.value} onChange={(e) => handleVariationValueChange(index, "value", e.target.value)} />
                   {newVariation.images && (
-                    <Input type="file" accept="image/*" onChange={(e) => handleFileUploadForValue(e, index)} />
-                  )}
+                      <select 
+                        value={value.image ? value.image.file.name : ""}
+                        onChange={(e) => {
+                          const selectedImage = approvedImages.find(img => img.file.name === e.target.value);
+                          handleVariationValueChange(index, "image", selectedImage ?? '');
+                        }}
+                      >
+                        <option value="">Select an image</option>
+                        {approvedImages.map((img, i) => (
+                          <option key={i} value={img.file.name}>{img.file.name}</option>
+                        ))}
+                      </select>
+                    )}
                   {newVariation.prices && (
                     <Input type="number" placeholder="Price" value={value.price} onChange={(e) => handleVariationValueChange(index, "price", e.target.value)} />
                   )}
