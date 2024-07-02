@@ -181,11 +181,6 @@ export function NewListingForm() {
     setNewVariation((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleDone = () => {
-    setVariations((prev) => [...prev, newVariation]);
-    setNewVariation({ type: "", values: [], images: false, prices: false, quantity: false, skus: false });
-    setShowModal(false);
-  };
 
   const handleFileUploadForValue = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     if (event.target.files) {
@@ -195,10 +190,33 @@ export function NewListingForm() {
     }
   };
 
+  const [editingVariationIndex, setEditingVariationIndex] = useState<number | null>(null);
+
   const handleEditVariation = (index: number) => {
     setNewVariation(variations[index]);
+    setEditingVariationIndex(index);
     setShowModal(true);
-    handleRemoveVariation(index);
+  };
+  
+  const handleCancelEdit = () => {
+    setShowModal(false);
+    setNewVariation({ type: "", values: [], images: false, prices: false, quantity: false, skus: false });
+    setEditingVariationIndex(null);
+  };
+  
+  const handleDone = () => {
+    if (editingVariationIndex !== null) {
+      setVariations((prev) => {
+        const updatedVariations = [...prev];
+        updatedVariations[editingVariationIndex] = newVariation;
+        return updatedVariations;
+      });
+    } else {
+      setVariations((prev) => [...prev, newVariation]);
+    }
+    setNewVariation({ type: "", values: [], images: false, prices: false, quantity: false, skus: false });
+    setShowModal(false);
+    setEditingVariationIndex(null);
   };
 
   const handleRemoveVariation = (index: number) => {
@@ -603,7 +621,7 @@ export function NewListingForm() {
             </div>
 
             <div className="flex justify-end space-x-4">
-              <Button type="button" onClick={() => setShowModal(false)}>Cancel</Button>
+              <Button type="button" onClick={handleCancelEdit}>Cancel</Button>
               <Button type="button" onClick={handleDone}>Done</Button>
             </div>
           </div>
