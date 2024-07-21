@@ -181,7 +181,7 @@ const App = () => {
                       id={card._id}
                       title={card.name}
                       content={card.description}
-                      image={card.images[0]}
+                      image={card.images && card.images.length > 0 ? card.images[0] : ''}  
                       price={card.commonPrice}
                       priceIndia={card.commonPrice}
                       sku={card.variants[0]?.SKU || 'N/A'}
