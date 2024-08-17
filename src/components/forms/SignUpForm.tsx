@@ -88,27 +88,10 @@ export default function SignInForm() {
         )}
       />
       </div>
-      <Button className='w-full mt-6 bg-gradient-to-b from-green-300 to-green-400 rounded-[69px]' type="submit">Sign up</Button>
+      <Button className='w-full mt-6 bg-gradient-to-b from-gray-300 to-gray-400 rounded-[69px]' type="submit">Sign up</Button>
     </form>
     <div className='mt-6 w-full '>
-      <p>Already have an account?<Link className='ml-1 text-green-500 hover:text-green-900' href='/login'>Login</Link></p>
-      <p className="mt-6 flex justify-around text-sm font-light">Or Sign up using</p>
-      <div className='mt-2 space-x-2 flex justify-center '>
-      <a href='http://localhost:8000/auth/google'> <div className="flex gap-7 text-[38px] text-green-300 justify-center md:justify-start">
-                {iconsTab.map(({ icon }, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="cursor-pointer hover:text-green-500"
-                      style={{ transition: "all 0.3s" }}
-                    >
-                      {icon}
-                    </div>
-                  );
-                })}
-              </div>
-              </a>
-              </div> 
+      <p>Already have an account?<Link className='ml-1 text-gray-500 hover:text-gray-900' href='/login'>Login</Link></p> 
       </div>
   </Form>
 

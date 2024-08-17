@@ -73,24 +73,7 @@ export default function SignInForm(error:any) {
     </form>
     <div className='mt-6 w-full '>
       <p>Don’t have an account?<Link className='ml-1 text-gray-500 hover:text-gray-900' href='/signup'>Register</Link></p>
-      <p className="mt-6 flex justify-around text-sm font-light">Or Sign up using</p>
-      <div className='mt-2 space-x-2 flex justify-center '>
-      
-     <a href='http://localhost:8000/auth/google'> <div className="flex gap-7 text-[38px] text-gray-300 justify-center md:justify-start">
-                {iconsTab.map(({ icon }, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="cursor-pointer hover:text-gray-500"
-                      style={{ transition: "all 0.3s" }}
-                    >
-                      {icon}
-                    </div>
-                  );
-                })}
-              </div>
-              </a>
-              </div> 
+    
     </div>
 
 
