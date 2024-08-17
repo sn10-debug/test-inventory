@@ -228,6 +228,8 @@ export function NewListingForm() {
     if(primaryImage){
       setPrimaryImage(null);
     }
+    
+   
     setFiles((prevFiles) => {
       const updatedFiles = prevFiles.map((file, i) =>
 
@@ -248,27 +250,38 @@ export function NewListingForm() {
   }
 
   const onSubmit = async (data:any) => {
+
     
 
     const approvedFiles = data.files.filter((file:FileWithStatus) => file.approved);
     const primaryFile = data.files.find((file:FileWithStatus) => file.primary);
     const formData = new FormData();
+    let image_mapping={} as any;
 
     approvedFiles.forEach((file: FileWithStatus, i: number) => {
       formData.append(`file-${i + 1}`, file.file);
+      image_mapping[file.file.name]=`file-${i+1}`;
     });
 
+    let variantionObj=variations.map((variation)=>({label:variation.type,
+      images:variation.images,
+      skus:variation.skus,
+      prices:variation.prices,
+      quantity:variation.quantity,
+      variants:variation.values.map((value:any)=>{
+      return {...value,image:image_mapping[value.image.file.name]}
+    })}));
 
-    console.log("Variations:", variations)
+    console.log(variantionObj)
 
 
-    formData.append("primaryImage", primaryFile?.file);
+    formData.append("primaryImage", primaryImage ? primaryImage.file : "");
     formData.append("category",category);
     formData.append("numImages", approvedFiles.length.toString());
-    formData.append("title", data.title);
+    formData.append("name", data.title);
     formData.append("description", data.description);
-    formData.append("indiaPrice", data.indiaPrice.toString());
-    formData.append("everywherePrice", data.everywherePrice.toString());
+    formData.append("priceIndia", data.indiaPrice.toString());
+    formData.append("priceEverywhereElse", data.everywherePrice.toString());
     formData.append("quantity", data.quantity.toString());
     formData.append("sku", data.sku);
     formData.append("category", data.category);
@@ -276,11 +289,17 @@ export function NewListingForm() {
     formData.append("material", JSON.stringify(data.material.split(",")));
     formData.append("indiaDiscount",data.indiaDiscount.toString());
     formData.append("everywhereElseDiscount",data.everywhereElseDiscount.toString());
-    formData.append("variations",JSON.stringify(variations))
+    formData.append("variantInfo",JSON.stringify(variantionObj));
     formData.append("featured",featured.toString());
     formData.append("returnable",returnListing.toString());
     formData.append("occassion",data.occassion);
+    formData.append("variationPriceVary",variations.some((variation)=>variation.prices).toString());
+    formData.append("variationQuantityVary",variations.some((variation)=>variation.quantity).toString());
+    formData.append("variationSKUVary",variations.some((variation)=>variation.skus).toString());
+    formData.append("variantsLabels", variations.map((variation)=>variation.type).join(","));
     console.log("Form data:", formData);
+
+
 
     try {
       const response = await addData(formData);
@@ -289,6 +308,13 @@ export function NewListingForm() {
       console.error('Error submitting form', error);
     }
   };
+
+  // console.log(variations)
+  // console.log(variations.map((variation)=>({label:variation.type,variants:variation.values})))
+  // approvedImages.forEach((file: FileWithStatus, i: number) => {
+  //   console.log(file.file.name)
+   
+  // })
 
 
   return (

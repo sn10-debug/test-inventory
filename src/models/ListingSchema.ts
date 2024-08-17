@@ -11,17 +11,14 @@ const ListingSchema = new Schema({
     type: String,
     required: [true, "Description should be provided"],
   },
-  
-  images: {
-    type: [String],
-    required: [true, "At least one image should be provided"],
+  images: [{
+    webViewLink: String,
+    webContentLink: String,
+  }],
+  primaryImage: {
+    webViewLink: String,
+    webContentLink: String,
   },
-
-  primaryImage:{
-    type:String,
-    required:[true,"Primary Image should be provided"]
-  },
-  
   createdAt: {
     type: Date,
     default: Date.now,
@@ -40,38 +37,21 @@ const ListingSchema = new Schema({
   },
   priceIndia: {
     type: Number,
-    // required: function () {
-    //   return this.variantsLabels.length === 0;
-    // },
-    required:[true,"Price for India should be Provided"]
+    required: [true, "Price for India should be provided"],
   },
   priceEverywhereElse: {
     type: Number,
-    // required: function () {
-    //   return this.variantsLabels.length === 0;
-    // },
-    required:[true,"Price for countries other than India Should be Provided"]
+    required: [true, "Price for countries other than India should be provided"],
   },
-  
   indiaDiscount: {
     type: Number,
-    // required: function () {
-    //   return this.variantsLabels.length === 0;
-    // },
-    default:0
+    default: 0,
   },
   everywhereElseDiscount: {
     type: Number,
-    // required: function () {
-    //   return this.variantsLabels.length === 0;
-    // },
-    default:0
+    default: 0,
   },
   variationPriceVary: {
-    type: Boolean,
-    default: false,
-  },
-  variationDiscountVary: {
     type: Boolean,
     default: false,
   },
@@ -83,38 +63,32 @@ const ListingSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  variantsLabels: [
-    {
-      variantType: String,
-      variantName: String,
-    },
-  ],
+  variantsLabels: [String],
   variantInfo: [
     {
-
-      type:{
-
-      label:String,
-      variants:[{
-        type:{
-          value:String,
-          image:String,
-          priceIndia:Number,
-          priceEverywhereElse:Number,
-          quantity:Number,
-          SKU:String
-        }
-      }]
-      
-    }
-  }
+      images: Boolean,
+      skus: Boolean,
+      prices: Boolean,
+      quantity: Boolean,
+      label: String,
+      variants: [{
+        value: String,
+        image: {
+          webViewLink: String,
+          webContentLink: String,
+        },
+        priceIndia: Number,
+        priceEverywhereElse: Number,
+        quantity: Number,
+        SKU: String,
+      }],
+    },
   ],
   reviews: [
     {
       type: Schema.Types.ObjectId,
       ref: "Review",
     },
-
   ],
   views: {
     type: Number,
@@ -140,43 +114,26 @@ const ListingSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  occassion:{
+  occasion: {
     type: [String],
-    default:[]
+    default: [],
   },
-  category:{
-    type:String,
+  category: {
+    type: String,
   },
-  featured:{
-    type:Boolean,
-    default:false
-  
+  featured: {
+    type: Boolean,
+    default: false,
   },
-  featuredCategory:{
-    type:String,
-    default:''
-  }
-  
+  featuredCategory: {
+    type: String,
+    default: '',
+  },
 });
 
 ListingSchema.pre("save", function (next) {
   this.updatedAt = new Date();
   next();
 });
-
-// ListingSchema.pre("findOneAndUpdate", function (next) {
-//   this._update.updatedAt = Date.now();
-//   next();
-// });
-
-// ListingSchema.pre("updateMany", function (next) {
-//   this._update.updatedAt = Date.now();
-//   next();
-// });
-
-// ListingSchema.pre("updateOne", function (next) {
-//   this._update.updatedAt = Date.now();
-//   next();
-// });
 
 export default mongoose.models.Listing || mongoose.model('Listing', ListingSchema);

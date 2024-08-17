@@ -69,7 +69,28 @@ export async function storeInGoogleDrive(folder_name:any, image_name:any, imager
         },
       });
       console.log(`Image uploaded for folder_id : ${folder_id}}`);
-      return response.data;
+      const fileId=response.data.id as string;
+
+      await drive.permissions.create({
+        fileId: fileId,
+        requestBody: {
+            role: "reader",
+            type: "anyone",
+        },
+    });
+
+    const result = await drive.files.get({
+        fileId: fileId,
+        fields: "webViewLink, webContentLink",
+    });
+
+    console.log(`File webViewLink: ${result.data.webViewLink}`);
+    console.log(`File webContentLink: ${result.data.webContentLink}`);
+
+    return {
+        webViewLink: result.data.webViewLink,
+        webContentLink: result.data.webContentLink,
+    }
     } catch (e) {
       console.log(e);
     }
