@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useRouter } from "next/navigation";
 
 
 import {
@@ -29,6 +30,7 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form"
+import { redirect } from "next/dist/server/api-utils";
 interface FileWithStatus {
   file: File;
   approved: boolean;
@@ -65,6 +67,7 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>;
 
 export function NewListingForm() {
+  const router = useRouter();
   const [files, setFiles] = useState<FileWithStatus[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [variations, setVariations] = useState<{
@@ -304,17 +307,20 @@ export function NewListingForm() {
     try {
       const response = await addData(formData);
       console.log('Form submitted successfully', response);
+      alert("Form submitted successfully");
+      router.push("/listings")
+
+
+
+  
+      
     } catch (error) {
+      alert("Error submitting form");
       console.error('Error submitting form', error);
     }
   };
 
-  // console.log(variations)
-  // console.log(variations.map((variation)=>({label:variation.type,variants:variation.values})))
-  // approvedImages.forEach((file: FileWithStatus, i: number) => {
-  //   console.log(file.file.name)
-   
-  // })
+ 
 
 
   return (

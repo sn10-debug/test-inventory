@@ -79,21 +79,6 @@ export const addData=async (data:FormData)=>{
     }
 
 
-    let variationImagesIndexs={};
-
-
-    // submissionData.variantInfo.forEach((variant:any,index:number)=>{
-      
-
-
-    //     variant.variant.forEach((value)=>{
-
-            
-
-
-
-    //     })
-    // })
 
     
     let listing=await ListingSchema.create(submissionData)
@@ -155,12 +140,6 @@ export const addData=async (data:FormData)=>{
 
 
     console.log("Listing Created Successfully!")
-    console.log(updatedListing)
-
-
-
-
-
 
 
     revalidatePath("/listings/newListing")
