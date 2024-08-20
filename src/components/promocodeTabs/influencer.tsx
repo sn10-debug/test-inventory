@@ -14,7 +14,7 @@ const promoCode = () => {
 
           <CardContent className="space-y-2 p-4">
           {promoCode.map((item)=>(
-            <div className="space-y-1">
+            <div key={item.id} className="space-y-1">
               <Label>{item.label}</Label>
               <Input type={item.type} placeholder="" />               
             </div>
@@ -27,10 +27,10 @@ const promoCode = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {regions.map((item)=>(
-                      <SelectGroup>
+                      <SelectGroup key={item.id}>
                       <SelectLabel>{item.label}</SelectLabel>
                       {item.countries.map((item)=>(
-                      <SelectItem value={item.value}>{item.label}</SelectItem>
+                      <SelectItem key={item.id} value={item.value}>{item.label}</SelectItem>
                       ))}
                     </SelectGroup>
                     ))}

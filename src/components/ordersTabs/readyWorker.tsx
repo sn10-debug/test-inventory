@@ -18,7 +18,7 @@ import "filepond/dist/filepond.min.css";
 import Image from "next/image"
 import jsonData from "@/data/orders.json"
 
-const ready = () => {   
+const useReady = () => {   
   const data=jsonData;
   const [files, setFiles] = useState([]);
   let pond: any = null;
@@ -26,7 +26,7 @@ const ready = () => {
     
     <Card className="p-[20px] space-y-4">
     {data.pendingOrders.map((item:any) => (
-      <Card>
+      <Card key={item.id}>
         <CardHeader>
         <div className="flex">
             <CardDescription>{item.orderedOn}</CardDescription>
@@ -40,7 +40,7 @@ const ready = () => {
             </CardDescription>
           </CardHeader>
           {item.products.map((product:any) => (
-          <CardContent className="flex flex-row space-x-4 justify-around items-center">      
+          <CardContent key={item.id} className="flex flex-row space-x-4 justify-around items-center">      
           <Image src={product?.image} alt={""} width={100} height={100} />     
             <div className="flex flex-col space-y-2">
             <CardDescription>{product.productName}</CardDescription>
@@ -72,4 +72,4 @@ const ready = () => {
         </Card>
   )
 }
-export default ready
+export default useReady

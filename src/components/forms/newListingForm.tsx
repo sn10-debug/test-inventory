@@ -330,7 +330,7 @@ export function NewListingForm() {
           <CardContent className="p-8">
             <CardHeader>
               <CardTitle className="font-bold text-2xl">About</CardTitle>
-              <CardDescription>Tell the world all about your item and why they'll love it.</CardDescription>
+              <CardDescription>Tell the world all about your item and why they&apos;ll love it.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>

@@ -14,7 +14,7 @@ const pending = () => {
     
     <Card className="p-[20px] space-y-4">
     {data.pendingOrders.map((item:any) => (
-      <Card>
+      <Card key={item.id}>
         <CardHeader>
         <div className="flex justify-between">
             <CardDescription>{item.orderedOn}</CardDescription>
@@ -28,7 +28,7 @@ const pending = () => {
             </CardDescription>
           </CardHeader>
           {item.products.map((product:any) => (
-          <CardContent className="flex flex-row space-x-4 justify-around items-center">      
+          <CardContent key={item.id} className="flex flex-row space-x-4 justify-around items-center">      
             <Image src={product?.image} alt={""} width={100} height={100} />     
             <div className="flex flex-col space-y-2">
             <CardDescription>{product.productName}</CardDescription>

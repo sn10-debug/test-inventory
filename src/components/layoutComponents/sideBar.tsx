@@ -51,7 +51,7 @@ export default function Sidebar({ show, setter }: { show: boolean, setter: React
                 </div>
                 <div className="flex flex-col text-white">
                     {navigation.map((item:any) => (
-                        <MenuItem
+                        <MenuItem key={item.id}
                         name={item.name}
                         route={item.route}
                         />
