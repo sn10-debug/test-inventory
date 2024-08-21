@@ -43,6 +43,7 @@ export const addData=async (data:FormData)=>{
         category:"",
         featured:false,
         featuredCategory:"",
+        sku:"",
     }
 
     
@@ -75,7 +76,8 @@ export const addData=async (data:FormData)=>{
         occassion:(data.get('occassion') as string).split(","),
         category:data.get('category') as string,
         featured:data.get('featured')=="true"?true:false,
-        featuredCategory:data.get('featuredCatgory') as string
+        featuredCategory:data.get('featuredCatgory') as string,
+        sku:data.get('sku') as string
     }
 
 

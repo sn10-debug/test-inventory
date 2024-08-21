@@ -11,6 +11,7 @@ const ListingSchema = new Schema({
     type: String,
     required: [true, "Description should be provided"],
   },
+  SKU:String,
   images: [{
     webViewLink: String,
     webContentLink: String,

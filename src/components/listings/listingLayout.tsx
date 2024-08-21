@@ -16,14 +16,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Spinner from '@/components/ui/spinner'; // Import the spinner component
-
+function extractFileId(webViewLink:string) {
+  const regex = /\/d\/([a-zA-Z0-9_-]+)\//;
+  const match = webViewLink.match(regex);
+  return match ? match[1] : null;
+}
 const CardComponent = ({ title, content, id, image, sku, price, priceIndia, status, variants, draft }: { title: string, content: string, id: string, image: string, sku: string, price: number, priceIndia: number, status: string, variants: { SKU: string }[], draft?: boolean }) => {
+  
+
+const webViewLink = image;
+const fileId = extractFileId(webViewLink);
   return (
+  
     <Card className='flex flex-col justify-between'>
       <div>
-      <Image
-        src={image}
-        width={500}
+      <img 
+        src={`https://drive.google.com/uc?export=view&id=${"1EaAjp5GU792n916TSKyqVSrIZsV0GimA"}`}
+        width={500} 
         height={500}
         alt="product image"
         className='w-full h-80 rounded hover:scale-105 md:object-contain md:object-contain xl:object-fill lg:object-contain'
@@ -73,18 +82,20 @@ const CardComponent = ({ title, content, id, image, sku, price, priceIndia, stat
 
 const App = () => {
   const [cards, setCards] = useState<{
-    draft: any; _id: string, name: string, description: string, images: string[], commonPrice: number, variants: { SKU: string }[]
+    draft: any; _id: string, name: string, description: string, images: any, priceIndia: number, SKU: string
   }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [searchResults, setSearchResults] = useState(cards);
   const [loading, setLoading] = useState(false); // State for loading
+  let domain='http://bohotree.vercel.app'
+  domain=''
 
   const fetchAllData = async () => {
     setLoading(true); // Show spinner
     try {
-      const response = await axios.get('http://bohotree.vercel.app/api/v1/listing');
+      const response = await axios.get(`${domain}/api/v1/listing`);
       setCards(response.data);
       setSearchResults(response.data);
     } catch (error) {
@@ -97,7 +108,7 @@ const App = () => {
   const fetchActiveData = async () => {
     setLoading(true); // Show spinner
     try {
-      const response = await axios.get('http://bohotree.vercel.app/api/v1/listing/active');
+      const response = await axios.get(`${domain}/api/v1/listing/active`);
       setCards(response.data);
       setSearchResults(response.data);
     } catch (error) {
@@ -110,7 +121,7 @@ const App = () => {
   const fetchDraftData = async () => {
     setLoading(true); // Show spinner
     try {
-      const response = await axios.get('http://bohotree.vercel.app/api/v1/listing/draft');
+      const response = await axios.get(`${domain}/api/v1/listing/draft`);
       setCards(response.data);
       setSearchResults(response.data);
     } catch (error) {
@@ -181,10 +192,10 @@ const App = () => {
                       id={card._id}
                       title={card.name}
                       content={card.description}
-                      image={card.images && card.images.length > 0 ? card.images[0] : ''}  
-                      price={card.commonPrice}
-                      priceIndia={card.commonPrice}
-                      sku={card.variants[0]?.SKU || 'N/A'}
+                      image={card.images && card.images.length > 0 ? card.images[0].webViewLink.slice(0,-13) : ''}  
+                      price={card.priceIndia}
+                      priceIndia={card.priceIndia}
+                      sku={card.SKU || 'N/A'}
                       status={card.draft ? 'draft' : 'active'}
                       variants={[]}
                     />
