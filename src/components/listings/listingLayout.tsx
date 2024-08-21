@@ -108,9 +108,10 @@ const App = () => {
   const fetchActiveData = async () => {
     setLoading(true); // Show spinner
     try {
-      const response = await axios.get(`${domain}/api/v1/listing/active`);
-      setCards(response.data);
-      setSearchResults(response.data);
+      let response = await axios.get(`${domain}/api/v1/listing/active`);
+      response=response.data
+      setCards(response.data["listings"]);
+      setSearchResults(response.data["listings"]);
     } catch (error) {
       console.error('Error fetching active data:', error);
     } finally {
@@ -121,9 +122,10 @@ const App = () => {
   const fetchDraftData = async () => {
     setLoading(true); // Show spinner
     try {
-      const response = await axios.get(`${domain}/api/v1/listing/draft`);
-      setCards(response.data);
-      setSearchResults(response.data);
+      let response = await axios.get(`${domain}/api/v1/listing/draft`);
+      response=response.data
+      setCards(response.data["listings"]);
+      setSearchResults(response.data["listings"]);
     } catch (error) {
       console.error('Error fetching draft data:', error);
     } finally {
@@ -171,6 +173,8 @@ const App = () => {
   useEffect(() => {
     fetchAllData();
   }, []);
+
+  console.log(cards)
 
   return (
     <Card>
