@@ -31,7 +31,7 @@ const fileId = extractFileId(webViewLink);
     <Card className='flex flex-col justify-between'>
       <div>
       <Image 
-        src={`https://drive.google.com/uc?export=view&id=${"1EaAjp5GU792n916TSKyqVSrIZsV0GimA"}`}
+        src={`https://drive.google.com/uc?export=view&id=${fileId}`}
         width={500} 
         height={500}
         alt="product image"
