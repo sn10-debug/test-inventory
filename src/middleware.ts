@@ -16,8 +16,8 @@ export async function middleware(req: NextRequest) {
         '/login/error',
         '/login/forgotpassword',
         '/signup',
-        '/api/auth/signin', // This is necessary for the authentication flow
-        '/api/auth/callback', // Needed for auth callback after signin
+        '/api/auth/signin', 
+        '/api/auth/callback', 
     ];
 
     const isPublicPath = publicPaths.some(path => pathname.startsWith(path));

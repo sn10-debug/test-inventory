@@ -70,25 +70,7 @@ export const options: NextAuthOptions = {
 
               const user=await User.findOne({Email:credentials?.username})
               
-              if(!user){
-
-                // generate the salt and hash for the password
-
-                let pass_details=genPassword(credentials?.password as string)
-
-                return User.create({
-                  Email:credentials?.username,
-                  name:credentials?.username,
-                  image:"",
-                  uniqueID:crypto.randomUUID(),
-                  verified:false,
-                  createdAt:Date.now(),
-                  updatedAt:Date.now(),
-                  googleId:"",
-                  hash:pass_details.hash,
-                  salt:pass_details.salt
-                })
-              }
+             
 
               if(user && validPassword(credentials ? credentials?.password : "",user.hash,user.salt)){
                 return user
