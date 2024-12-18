@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect  from '@/utils/dbConnect';
 import Listing from '@/models/ListingSchema';
 
+
+
+export const revalidate = 0;
 export async function GET(req: NextRequest,{params}:any) {
 
     await dbConnect();
