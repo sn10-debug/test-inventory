@@ -6,6 +6,7 @@ import {storeInGoogleDrive} from "../src/utils/googleDriveImageUploader"
 import dbConnect from "@/utils/dbConnect"
 import ListingSchema from "@/models/ListingSchema"
 import { Value } from "@radix-ui/react-select"
+import { link } from "fs"
 
 
 
@@ -145,6 +146,130 @@ export const addData=async (data:FormData)=>{
 
 
     revalidatePath("/listings/newListing")
+
+
+}
+
+
+
+//   Testing the New Functionality
+
+
+
+export const updateListingURL=async (data:any,listingId:String)=>{
+
+    await dbConnect();
+let updatedListing=await ListingSchema.updateOne({_id:listingId},{
+    images:data.imagesUrls,
+primaryImage:data.primaryImage.webViewLink,
+variantInfo:data.variantObj
+},{new:true})
+
+return updatedListing
+
+}
+export const addListing=async (data:FormData)=>{
+
+    await dbConnect();
+
+
+    let submissionData= {
+        name:"",
+        description:"",
+        images:[] as any[],
+        quantity:0,
+        primaryImage:{} as any,
+        tags:[] as string[],
+        material:[] as string[],
+        priceIndia:0,
+        priceEverywhereElse:0,
+        indiaDiscount:0,
+        everywhereElseDiscount:0,
+        variationPriceVary:false,
+        variationQuantityVary:false,
+        variationSKUVary:false,
+        variantsLabels:[] as string[],
+        variantInfo:[] as Object[],
+        reviews:[],
+        views:0,
+        rating:0,
+        soldQuantity:0,
+        draft:true ,
+        listed:false,
+        returnable:false,
+        occassion:[] as string[],
+        category:"",
+        featured:false,
+        featuredCategory:"",
+        sku:"",
+    }
+
+    
+
+
+    submissionData={...submissionData,
+         name:data.get('name') as string,
+        description:data.get('description') as string,
+        images:[],
+        quantity:parseInt(data.get('quantity') as string),
+        primaryImage:" " as string,
+        tags:(data.get('tags') as string).split(","),
+        material:(data.get('material') as string).split(","),
+        priceIndia:parseInt(data.get('priceIndia') as string),
+        priceEverywhereElse:parseInt(data.get('priceEverywhereElse') as string),
+        indiaDiscount:parseInt(data.get('indiaDiscount') as string),
+        everywhereElseDiscount:parseInt(data.get('everywhereElseDiscount') as string),
+        variantInfo:[] as any[],
+        variationPriceVary:data.get('variationPriceVary')=="true"?true:false,
+        variationQuantityVary:data.get('variationQuantityVary')=="true"?true:false,
+        variationSKUVary:data.get('variationSKUVary')=="true"?true:false,
+        variantsLabels:(data.get('variantsLabels') as string).split(","),
+        reviews:[],
+        views:0,
+        rating:0,
+        soldQuantity:0,
+        draft:true ,
+        listed:false,
+        returnable:data.get('returnable')=="true"?true:false,
+        occassion:(data.get('occassion') as string).split(","),
+        category:data.get('category') as string,
+        featured:data.get('featured')=="true"?true:false,
+        featuredCategory:data.get('featuredCatgory') as string,
+        sku:data.get('sku') as string
+    }
+
+
+
+    
+    let listing=await ListingSchema.create(submissionData)
+    
+
+   console.log("Listing Created Successfully! : "+` ${submissionData.name}`)
+
+
+
+    return listing._id
+
+
+
+}
+
+
+export const uploadImage=async (data:FormData,name:string,listingId:string)=>{
+
+
+        console.log("Uploading Image....")
+  
+        const file:File=(data.get(name)) as File;
+
+         const bytes=await file.arrayBuffer()
+        const buffer=Buffer.from(bytes)
+   
+        const imageURL=await storeInGoogleDrive(listingId.toString(),name,buffer);
+        console.log("Image Uploaded Successfully!")
+        console.log(imageURL)
+
+        return imageURL
 
 
 }
