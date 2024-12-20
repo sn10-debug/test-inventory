@@ -92,13 +92,17 @@ export async function storeInGoogleDrive(folder_name:any, image_name:any, imager
     });
   
     folder_name = folder_name ? folder_name : "Unknown Folder";
-    let response = await drive.files.list({
+    let response={} as any;
+
+    if(!folder_id){
+     response = await drive.files.list({
       q: `mimeType='application/vnd.google-apps.folder' and name='${folder_name}' and trashed = false`,
       fields: "files(id, name)",
     });
+  }
     let folder;
     
-  
+    if(!folder_id){
     if (response.data.files && response.data.files.length > 0) {
       folder = response.data.files[0];
       console.log("Folder ID: ", folder.id);
@@ -119,6 +123,7 @@ export async function storeInGoogleDrive(folder_name:any, image_name:any, imager
         return;
       }
     }
+  }
   
     try {
       const response = await drive.files.create({
