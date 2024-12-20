@@ -3,9 +3,74 @@ import axios from "axios";
 import {google} from "googleapis"
 
 import {Readable} from "stream"
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 
 
-export async function storeInGoogleDrive(folder_name:any, image_name:any, imageraw:any) {
+async function getAccessToken() {
+  const response = await axios.post('https://oauth2.googleapis.com/token', {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      refresh_token: REFRESH_TOKEN,
+      grant_type: 'refresh_token',
+  });
+  return response.data.access_token;
+}
+
+export async function createFolder(folder_name:string) {
+  const redirect_url = "https://developers.google.com/oauthplayground";
+
+  const oauth2Client = new google.auth.OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    redirect_url
+  );
+
+  oauth2Client.setCredentials({
+    refresh_token: REFRESH_TOKEN,
+  });
+
+  const drive = google.drive({
+    version: "v3",
+    auth: oauth2Client,
+  });
+  
+  folder_name = folder_name ? folder_name : "Unknown Folder";
+  let response = await drive.files.list({
+    q: `mimeType='application/vnd.google-apps.folder' and name='${folder_name}' and trashed = false`,
+    fields: "files(id, name)",
+  });
+  let folder;
+  let folder_id = "";
+
+  if (response.data.files && response.data.files.length > 0) {
+    folder = response.data.files[0];
+    console.log("Folder ID: ", folder.id);
+    console.log("Folder Already exists");
+    folder_id = folder.id ? folder.id : "";
+    return folder_id;
+  }else {
+  try {
+    folder = await drive.files.create({
+      requestBody: {
+        name: folder_name,
+        mimeType: "application/vnd.google-apps.folder",
+      },
+      fields: "id",
+    });
+    console.log("Folder ID: ", folder.data.id);
+    folder_id =folder.data.id ?  folder.data.id : "";
+    return folder_id;
+  } catch (e) {
+    console.log(e);
+  }
+}
+}
+
+export async function storeInGoogleDrive(folder_name:any, image_name:any, imageraw:any,folder_id="") {
+
+  console.log(`Created Folder ID: ${folder_id}`);
     const refresh_token = process.env.REFRESH_TOKEN;
     const redirect_url = "https://developers.google.com/oauthplayground";
     const client_id = process.env.GOOGLE_CLIENT_ID;
@@ -32,7 +97,7 @@ export async function storeInGoogleDrive(folder_name:any, image_name:any, imager
       fields: "files(id, name)",
     });
     let folder;
-    let folder_id = "";
+    
   
     if (response.data.files && response.data.files.length > 0) {
       folder = response.data.files[0];

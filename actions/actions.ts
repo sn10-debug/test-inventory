@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
-import {storeInGoogleDrive} from "../src/utils/googleDriveImageUploader"
+import {storeInGoogleDrive,createFolder} from "../src/utils/googleDriveImageUploader"
 import dbConnect from "@/utils/dbConnect"
 import ListingSchema from "@/models/ListingSchema"
 import { Value } from "@radix-ui/react-select"
@@ -10,7 +10,15 @@ import { link } from "fs"
 
 
 
+export const uploadFolder=async (folder_name:string)=>{
+    try{
 
+    console.log("Creating Folder....")
+    return await createFolder(folder_name);
+    }catch(e){
+        console.log(e)
+    }
+}
 export const addData=async (data:FormData)=>{
 
 
@@ -255,7 +263,7 @@ export const addListing=async (data:FormData)=>{
 }
 
 
-export const uploadImage=async (data:FormData,name:string,listingId:string)=>{
+export const uploadImage=async (data:FormData,name:string,listingId:string,folderId="")=>{
 
 
         console.log("Uploading Image....")
@@ -265,7 +273,7 @@ export const uploadImage=async (data:FormData,name:string,listingId:string)=>{
          const bytes=await file.arrayBuffer()
         const buffer=Buffer.from(bytes)
    
-        const imageURL=await storeInGoogleDrive(listingId.toString(),name,buffer);
+        const imageURL=await storeInGoogleDrive(listingId.toString(),name,buffer,folderId);
         console.log("Image Uploaded Successfully!")
         console.log(imageURL)
 

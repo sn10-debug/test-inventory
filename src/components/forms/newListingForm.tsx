@@ -8,7 +8,7 @@ import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addData, addListing, updateListingURL, uploadImage } from "../../../actions/actions";
+import { addData, addListing, updateListingURL, uploadFolder, uploadImage } from "../../../actions/actions";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -31,6 +31,7 @@ import {
   FormLabel,
 } from "@/components/ui/form"
 import { redirect } from "next/dist/server/api-utils";
+import { createFolder } from "@/utils/googleDriveImageUploader";
 interface FileWithStatus {
   file: File;
   approved: boolean;
@@ -391,6 +392,10 @@ export function NewListingForm() {
      
       console.log('Listing Created Successfully',listingId);
 
+      console.log("Uploading Folder ...")
+
+      const folder_id= await uploadFolder(listingId);
+
       console.log('Uploading Image')
 
       
@@ -406,7 +411,7 @@ export function NewListingForm() {
             console.log(fileObj)
             data.append(image_mapping[fileObj.file.name],fileObj.file)
            
-           return uploadImage(data,image_mapping[fileObj.file.name], listingId)
+           return uploadImage(data,image_mapping[fileObj.file.name], listingId,folder_id)
           }
           );
           
