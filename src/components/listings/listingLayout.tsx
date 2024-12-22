@@ -196,7 +196,7 @@ const App = () => {
                       id={card._id}
                       title={card.name}
                       content={card.description}
-                      image={card.images && card.images.length > 0 ? card.images[0].webViewLink.slice(0,-13) : ''}  
+                      image={card.images && card.images.length > 0 ? (card.images[0]?.webViewLink ? card.images[0].webViewLink.slice(0,-13):"") : ''}  
                       price={card.priceIndia}
                       priceIndia={card.priceIndia}
                       sku={card.SKU || 'N/A'}

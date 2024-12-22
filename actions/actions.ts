@@ -7,6 +7,13 @@ import dbConnect from "@/utils/dbConnect"
 import ListingSchema from "@/models/ListingSchema"
 import { Value } from "@radix-ui/react-select"
 import { link } from "fs"
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+
+
 
 
 
@@ -145,7 +152,7 @@ export const addData=async (data:FormData)=>{
     let updatedListing=await ListingSchema.updateOne({_id:listingId},{
         images:imagesUrls,
     primaryImage:imagesUrls[primaryImagefileIndex].webViewLink,
-    variantInfo:variantObj
+    variantInfo:variantObj,
     },{new:true})
 
 
@@ -169,8 +176,9 @@ export const updateListingURL=async (data:any,listingId:String)=>{
     await dbConnect();
 let updatedListing=await ListingSchema.updateOne({_id:listingId},{
     images:data.imagesUrls,
-primaryImage:data.primaryImage.webViewLink,
-variantInfo:data.variantObj
+primaryImage:data.primaryImage,
+variantInfo:data.variantObj,
+videoLink:data.videoURL
 },{new:true})
 
 return updatedListing
@@ -281,3 +289,69 @@ export const uploadImage=async (data:FormData,name:string,listingId:string,folde
 
 
 }
+const s3Client = new S3Client({
+    region: process.env.AWS_BUCKET_REGION!,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+  })
+
+const allowedFileTypes = [
+    "image/jpeg",
+    "image/png",
+    "video/mp4",
+    "video/quicktime"
+  ]
+  
+  const maxFileSize = 1048576 * 10 // 1 MB
+  
+  type GetSignedURLParams = {
+    fileType: string|undefined,
+    fileSize: number|undefined,
+    checksum: string,
+    listingId:string,
+    fileName:string
+  }
+  export async function getSignedURL({
+    fileType,
+    fileSize,
+    checksum,listingId,fileName
+  }: GetSignedURLParams) {
+
+    const session = await getServerSession(authOptions);
+   
+    if(!session) return {failure:"Not Authenticated"}
+      
+  
+    // first just make sure in our code that we're only allowing the file types we want
+    if (!allowedFileTypes.includes(fileType as string)) {
+      return { failure: "File type not allowed" }
+    }
+  
+    if ((fileType === "image/jpeg" || fileType === "image/png") && (fileSize && fileSize > maxFileSize)) {
+        return { failure: "File too large" }
+    }
+
+  
+    const putObjectCommand = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME!,
+      Key: fileName,
+      ContentType: fileType,
+      ContentLength: fileSize,
+      ChecksumSHA256: checksum,
+      // Let's also add some metadata which is stored in s3.
+      Metadata: {
+        listingId
+      },
+    })
+  
+  // ...
+  const url = await getSignedUrl(
+    s3Client,
+    putObjectCommand,
+    { expiresIn: 60 } // 60 seconds
+  )
+
+  return {success: {url}}
+} 

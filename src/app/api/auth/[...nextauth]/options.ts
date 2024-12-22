@@ -24,7 +24,7 @@ export const options: NextAuthOptions = {
             }).then((users)=>{
                   if(users.length==0){
                     return User.create({
-                      Email:profile.email,
+                      Email:profile.name,
                       name:profile.name,
                       image:profile.picture,
                       uniqueID:crypto.randomUUID(),
@@ -61,7 +61,6 @@ export const options: NextAuthOptions = {
             async authorize(credentials,req) {
 
 
-
               try{
 
 
@@ -69,11 +68,10 @@ export const options: NextAuthOptions = {
 
 
               const user=await User.findOne({Email:credentials?.username})
-              
              
 
-              if(user && validPassword(credentials ? credentials?.password : "",user.hash,user.salt)){
-                return user
+             if(user && validPassword(credentials ? credentials?.password : "",user.hash,user.salt)){
+             return { id: user._id.toString(), email: user.Email, name: user.name }; 
               }
               else {
                 return null
@@ -101,13 +99,22 @@ export const options: NextAuthOptions = {
     callbacks:{
       async jwt({token, user}){
         if(user){
-          token.user = user
+          token.id=user.id;
+          token.user={ id: user.id, email: user.email, name: user.name };
         }
+        console.log("JWT Token : ",token)
         return token
       },
       async session({session , token} : any){
+
+         
+        session.id=token.id
         session.user = token.user
+        console.log("Session : ",session)
         return session
       }
-    }
+    },session: {
+      strategy: "jwt", // Ensure you're using the 'jwt' strategy
+    },
+    
 }

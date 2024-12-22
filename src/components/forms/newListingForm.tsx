@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "../ui/button";
@@ -8,7 +8,7 @@ import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addData, addListing, updateListingURL, uploadFolder, uploadImage } from "../../../actions/actions";
+import { addData, addListing, updateListingURL, uploadFolder, uploadImage ,getSignedURL} from "../../../actions/actions";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -227,6 +227,9 @@ export function NewListingForm() {
     setVariations((prev) => prev.filter((_, i) => i !== index));
   };
 
+
+ 
+
   const handlePrimary=(index:Number)=>{
 
     if(primaryImage){
@@ -330,10 +333,10 @@ export function NewListingForm() {
   };
 
 
-  const onSubmit=async (data:any)=>{
+  const onSubmit3=async (data:any)=>{
 
 
-
+    try{
     // Image Names are given
     // Map the Images with the Storing Image Names
     // Get the URL of the Image for each image
@@ -342,10 +345,7 @@ export function NewListingForm() {
 
     const formData = new FormData();
     const approvedFiles = data.files.filter((file:FileWithStatus) => file.approved);
-    const primaryFile = data.files.find((file:FileWithStatus) => file.primary);
-
-    console.log(primaryImage)
-
+  
 
     const image_mapping={} as any;
 
@@ -384,51 +384,257 @@ export function NewListingForm() {
 
    
 
+   
 
+    //   console.log("Uploading Folder ...")
+
+    //   const folder_id= await uploadFolder(listingId);
+
+    //   console.log('Uploading Image')
+
+      
+    //   let images=[] as Buffer[]
+    //   let imagesUrls=[] as any[]
+      
+    //   const imageURLMapping ={} as any
+      
+    //       let primaryImagefileIndex=0 as number;
+    //       console.log(approvedFiles)
+    //       const uploadPromises = approvedFiles.map((fileObj:FileWithStatus) =>{ 
+    //         const data=new FormData();
+    //         console.log(fileObj)
+    //         data.append(image_mapping[fileObj.file.name],fileObj.file)
+           
+    //        return uploadImage(data,image_mapping[fileObj.file.name], listingId,folder_id)
+    //       }
+    //       );
+          
+    //       console.log(uploadPromises)
+    //      let urls=await Promise.all(uploadPromises)
+    //      console.log(urls)
+            
+    //       for (let i=0;i<approvedFiles.length;i++){
+        
+    //         imagesUrls.push(urls[i])
+    //         imageURLMapping[image_mapping[approvedFiles[i].file.name]]=urls[i]
+
+    //       }
+
+    //       console.log("Updating Final Data ...")
+
+    //       console.log(variations)
+          
+    // let variantionObj=variations.map((variation)=>({label:variation.type,
+    //   images:variation.images,
+    //   skus:variation.skus,
+    //   prices:variation.prices,
+    //   quantity:variation.quantity,
+    //   variants:variation.values.map((value:any)=>{
+    //     return Object.assign({}, value, { image: imageURLMapping[image_mapping[value.image.file.name]] });
+
+    // })}));
+    //       const updatedData={} as any;
+
+
+    //       updatedData["imagesUrls"]=imagesUrls;
+    //       updatedData["primaryImage"]=imageURLMapping[image_mapping[primaryImage ? primaryImage.file.name : ""]];
+    //       updatedData["variantObj"]=variantionObj;
+
+    //       await updateListingURL(updatedData,listingId)
+
+
+      
+    //   alert("Form submitted successfully");
+    //   router.push("/listings")
+
+
+
+  
+      
+    } catch (error) {
+      alert("Error submitting form");
+      console.error('Error submitting form', error);
+    }
+  }
+
+  const onSubmit=async (data:any)=>{
+    const formData = new FormData();
+    const approvedFiles = data.files.filter((file:FileWithStatus) => file.approved);
+  
+
+    const image_mapping={} as any;
+
+
+    approvedFiles.forEach((file: FileWithStatus, i: number) => {
+      image_mapping[file.file.name]=`Img-${i+1}`;
+    });
+
+
+
+    formData.append("category",category);
+    formData.append("name", data.title);
+    formData.append("description", data.description);
+    formData.append("priceIndia", data.indiaPrice.toString());
+    formData.append("priceEverywhereElse", data.everywherePrice.toString());
+    formData.append("quantity", data.quantity.toString());
+    formData.append("sku", data.sku);
+    formData.append("category", data.category);
+    formData.append("tags", JSON.stringify(data.tags.split(",")));
+    formData.append("material", JSON.stringify(data.material.split(",")));
+    formData.append("indiaDiscount",data.indiaDiscount.toString());
+    formData.append("everywhereElseDiscount",data.everywhereElseDiscount.toString());
+    formData.append("featured",featured.toString());
+    formData.append("returnable",returnListing.toString());
+    formData.append("occassion",data.occassion);
+    formData.append("variationPriceVary",variations.some((variation)=>variation.prices).toString());
+    formData.append("variationQuantityVary",variations.some((variation)=>variation.quantity).toString());
+    formData.append("variationSKUVary",variations.some((variation)=>variation.skus).toString());
+    formData.append("variantsLabels", variations.map((variation)=>variation.type).join(","));
+
+   
+
+    const computeSHA256 = async (file: File) => {
+      const buffer = await file.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      return hashHex;
+    };
 
     try {
+
+      
+
+  
+  
+
+      
+      const imageFiles=approvedFiles.filter((file:FileWithStatus)=>file.file.type.startsWith("image/"));
+      console.log(imageFiles)
+      const videoFiles=approvedFiles.filter((file:FileWithStatus)=>file.file.type.startsWith("video/"));
+      console.log(videoFiles)
+      if(imageFiles.length>10){ 
+        
+        throw new Error("Maximum 10 images are allowed");
+      }
+
+      if(videoFiles.length>1){
+        throw new Error("Only 1 video is allowed");
+      }
+      type GetSignedURLParams = {
+        fileType: string|undefined,
+        fileSize: number|undefined,
+        checksum: string,
+        listingId:string
+      }
+     
+      
       const listingId = await addListing(formData);
       
      
       console.log('Listing Created Successfully',listingId);
-
-      console.log("Uploading Folder ...")
-
-      const folder_id= await uploadFolder(listingId);
-
-      console.log('Uploading Image')
 
       
       let images=[] as Buffer[]
       let imagesUrls=[] as any[]
       
       const imageURLMapping ={} as any
-      
-          let primaryImagefileIndex=0 as number;
-          console.log(approvedFiles)
-          const uploadPromises = approvedFiles.map((fileObj:FileWithStatus) =>{ 
-            const data=new FormData();
-            console.log(fileObj)
-            data.append(image_mapping[fileObj.file.name],fileObj.file)
-           
-           return uploadImage(data,image_mapping[fileObj.file.name], listingId,folder_id)
-          }
-          );
-          
-          console.log(uploadPromises)
-         let urls=await Promise.all(uploadPromises)
-         console.log(urls)
-            
-          for (let i=0;i<approvedFiles.length;i++){
-        
-            imagesUrls.push(urls[i])
-            imageURLMapping[image_mapping[approvedFiles[i].file.name]]=urls[i]
+      const uploadPromises = imageFiles.map(async (fileObj:FileWithStatus,i:number) =>{
+        const file= fileObj.file;      
+        type GetSignedURLParams = {
+          fileType: string|undefined,
+          fileSize: number|undefined,
+          checksum: string,
+          listingId:string,
+          fileName:string
+        }
 
+        let obj :GetSignedURLParams={
+          fileType:fileObj.file.type,
+          fileSize:fileObj.file.size,
+          checksum:"",
+          listingId:listingId,
+          fileName:listingId+"-"+`Img-${i+1}`
           }
+  
+        obj['checksum']=await computeSHA256(fileObj?.file);
+  
+        obj['checksum']=await computeSHA256(fileObj?.file);
+        let signedObj=await getSignedURL(obj);
+        if (signedObj.failure) throw new Error(`Error in getting Signed URL for ${file.name}`);
+        const signedURL=signedObj.success?.url
+        imagesUrls.push(signedURL?.split("?")[0]);
+        imageURLMapping[image_mapping[approvedFiles[i].file.name]]=signedURL?.split("?")[0]
+
+        return await fetch(signedURL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": file.type,
+          },
+          body: file,
+        })
+
+            }
+              );
+
+        const uploadData=await Promise.all(uploadPromises);
+        
+
+        
+        console.log(uploadData)
+        
+        console.log("Uploading video....")
+
+
+        let videoURLs=await Promise.all(videoFiles.map(async (fileObj:FileWithStatus,i:number) =>{
+          const file= fileObj.file;
+          type GetSignedURLParams = {
+            fileType: string|undefined,
+            fileSize: number|undefined,
+            checksum: string,
+            listingId:string,
+            fileName:string
+          }
+
+          let obj :GetSignedURLParams={
+            fileType:fileObj.file.type,
+            fileSize:fileObj.file.size,
+            checksum:"",
+            listingId:listingId,
+            fileName:listingId+"-"+"video"
+            }
+
+          obj['checksum']=await computeSHA256(fileObj?.file);
+          let signedObj=await getSignedURL(obj);
+          if (signedObj.failure) throw new Error(`Error in getting Signed URL for ${file.name}`);
+          const signedURL=signedObj.success?.url
+          return await fetch(signedURL, {
+            method: "PUT",
+            headers: {
+              "Content-Type": file.type,
+            },
+            body: file,
+          })
+
+        }));
+
+
+      
+
+        const videoURL=(videoURLs)[0].url.split('?')[0];
+       
+
+
+
+
+
+         
 
           console.log("Updating Final Data ...")
 
-          console.log(variations)
+
           
     let variantionObj=variations.map((variation)=>({label:variation.type,
       images:variation.images,
@@ -445,24 +651,24 @@ export function NewListingForm() {
           updatedData["imagesUrls"]=imagesUrls;
           updatedData["primaryImage"]=imageURLMapping[image_mapping[primaryImage ? primaryImage.file.name : ""]];
           updatedData["variantObj"]=variantionObj;
+          updatedData["videoURL"]=videoURL;
 
           await updateListingURL(updatedData,listingId)
 
 
-      
-      alert("Form submitted successfully");
-      router.push("/listings")
+        alert("Form submitted successfully");
 
+            
+
+  }catch (error:any) {
+    alert(error.message);
+    console.error('Error submitting form', error);
+  }
+
+}
 
 
   
-      
-    } catch (error) {
-      alert("Error submitting form");
-      console.error('Error submitting form', error);
-    }
-  }
-
  
 
 

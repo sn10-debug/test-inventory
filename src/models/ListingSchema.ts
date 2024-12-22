@@ -11,15 +11,10 @@ const ListingSchema = new Schema({
     type: String,
     required: [true, "Description should be provided"],
   },
+  videoLink:String,
   SKU:String,
-  images: [{
-    webViewLink: String,
-    webContentLink: String,
-  }],
-  primaryImage: {
-    webViewLink: String,
-    webContentLink: String,
-  },
+  images: [String],
+  primaryImage: String,
   createdAt: {
     type: Date,
     default: Date.now,
@@ -74,10 +69,7 @@ const ListingSchema = new Schema({
       label: String,
       variants: [{
         value: String,
-        image: {
-          webViewLink: String,
-          webContentLink: String,
-        },
+        image: String,
         priceIndia: Number,
         priceEverywhereElse: Number,
         quantity: Number,
