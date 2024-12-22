@@ -568,7 +568,7 @@ export function NewListingForm() {
         imagesUrls.push(signedURL?.split("?")[0]);
         imageURLMapping[image_mapping[approvedFiles[i].file.name]]=signedURL?.split("?")[0]
 
-        return await fetch(signedURL, {
+        return await fetch(signedURL ? signedURL : "", {
           method: "PUT",
           headers: {
             "Content-Type": file.type,
@@ -610,7 +610,7 @@ export function NewListingForm() {
           let signedObj=await getSignedURL(obj);
           if (signedObj.failure) throw new Error(`Error in getting Signed URL for ${file.name}`);
           const signedURL=signedObj.success?.url
-          return await fetch(signedURL, {
+          return await fetch(signedURL ? signedURL : "", {
             method: "PUT",
             headers: {
               "Content-Type": file.type,

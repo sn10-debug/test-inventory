@@ -9,8 +9,7 @@ import { Value } from "@radix-ui/react-select"
 import { link } from "fs"
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
 
 
 
@@ -319,9 +318,7 @@ const allowedFileTypes = [
     checksum,listingId,fileName
   }: GetSignedURLParams) {
 
-    const session = await getServerSession(authOptions);
-   
-    if(!session) return {failure:"Not Authenticated"}
+  
       
   
     // first just make sure in our code that we're only allowing the file types we want

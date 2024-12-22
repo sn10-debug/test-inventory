@@ -71,7 +71,7 @@ export const options: NextAuthOptions = {
              
 
              if(user && validPassword(credentials ? credentials?.password : "",user.hash,user.salt)){
-             return { id: user._id.toString(), email: user.Email, name: user.name }; 
+             return user; 
               }
               else {
                 return null
