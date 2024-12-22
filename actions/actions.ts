@@ -289,10 +289,10 @@ export const uploadImage=async (data:FormData,name:string,listingId:string,folde
 
 }
 const s3Client = new S3Client({
-    region: process.env.AWS_BUCKET_REGION!,
+    region: process.env.BUCKET_REGION!,
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      accessKeyId: process.env.ACCESS_KEY!,
+      secretAccessKey: process.env.SECRET_ACCESS_KEY!,
     },
   })
 
@@ -332,7 +332,7 @@ const allowedFileTypes = [
 
   
     const putObjectCommand = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME!,
+      Bucket: process.env.BUCKET_NAME!,
       Key: fileName,
       ContentType: fileType,
       ContentLength: fileSize,
