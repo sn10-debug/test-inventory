@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useRouter } from "next/navigation";
-
+import VariationImageDropdown from "@/components/dropdown/VariationImage";
 
 import {
   Form,
@@ -63,6 +63,9 @@ const schema = z.object({
   everywhereElseDiscount:z.string().min(0,"Discount should be greater than 0"),
   category:z.enum(["Trims & Laces","Fabrics","Appliqué","Tassels & Latkans"]),
   occassion:z.enum(["Diwali","Christmas","St. patricks day","Holi",""]).nullish(),
+  color:z.string().min(1,"Colour should be provided"),
+  length:z.string().min(0,"Length should be provided"),
+  width:z.string().min(0,"Width should be provided"),
 });
 
 type FormFields = z.infer<typeof schema>;
@@ -490,7 +493,9 @@ export function NewListingForm() {
     formData.append("variationQuantityVary",variations.some((variation)=>variation.quantity).toString());
     formData.append("variationSKUVary",variations.some((variation)=>variation.skus).toString());
     formData.append("variantsLabels", variations.map((variation)=>variation.type).join(","));
-
+    formData.append("length",data.length);
+    formData.append("width",data.width);
+    formData.append("color",data.color);
    
 
     const computeSHA256 = async (file: File) => {
@@ -652,6 +657,8 @@ export function NewListingForm() {
 
 
         alert("Form submitted successfully");
+        router.push("/listings")
+
 
             
 
@@ -780,7 +787,7 @@ export function NewListingForm() {
 
                   </div>
                   <div>
-                    <label>Everywhere else</label>
+                    <label>Everywhere else {'($)'}</label>
                     <Input placeholder="0" {...register("everywherePrice")} type="number" />
                     {errors.everywherePrice && <p className="text-red-500">{String(errors.everywherePrice.message)}</p>}
 
@@ -793,7 +800,7 @@ export function NewListingForm() {
                   </div>
 
                   <div>
-                    <label>Everywhere else Discount</label>
+                    <label>Everywhere else Discount {'($)'}</label>
                     <Input placeholder="Enter other Countries Discount"  {...register("everywhereElseDiscount")} type="number" />
                     {errors.everywhereElseDiscount && <p className="text-red-500">{String(errors.everywhereElseDiscount.message)}</p>}
 
@@ -804,6 +811,11 @@ export function NewListingForm() {
                 <CardTitle>Quantity*</CardTitle>
               </div>
               <div>
+                <Label htmlFor="color">Color*</Label>
+                <Input placeholder="Enter Color" {...register("color")} type="text" />
+                {errors.quantity && <p className="text-red-500">{String(errors.quantity.message)}</p>}
+              </div>
+              <div>
                 <Label htmlFor="quantity">Quantity*</Label>
                 <Input placeholder="Enter Quantity" {...register("quantity")} type="number" />
                 {errors.quantity && <p className="text-red-500">{String(errors.quantity.message)}</p>}
@@ -812,6 +824,16 @@ export function NewListingForm() {
                 <Label htmlFor="sku">SKU (Stock Keeping Unit)*</Label>
                 <Input type="text" placeholder="Enter SKU" {...register("sku")} />
                 {errors.sku && <p className="text-red-500">{String(errors.sku.message)}</p>}
+              </div>
+              <div>
+                <Label htmlFor="length">Length*</Label>
+                <Input placeholder="Enter Length" {...register("length")} type="number" />
+                {errors.quantity && <p className="text-red-500">{String(errors.quantity.message)}</p>}
+              </div>
+              <div>
+                <Label htmlFor="width">Width*</Label>
+                <Input placeholder="Enter Width" {...register("width")} type="number" />
+                {errors.quantity && <p className="text-red-500">{String(errors.quantity.message)}</p>}
               </div>
             </CardContent>
           </CardContent>
@@ -937,7 +959,6 @@ export function NewListingForm() {
           </Card>
        
         <div className="flex justify-end space-x-4">
-          <Button variant={'outline'}>Save as Draft</Button>
           <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Loading..." :"Submit"}</Button>
         </div>
       </form>
@@ -954,18 +975,11 @@ export function NewListingForm() {
                 <div key={index} className="flex items-center space-x-2">
                   <Input placeholder="Value" value={value.value} onChange={(e) => handleVariationValueChange(index, "value", e.target.value)} />
                   {newVariation.images && (
-                      <select 
-                        value={value.image ? value.image.file.name : ""}
-                        onChange={(e) => {
-                          const selectedImage = approvedImages.find(img => img.file.name === e.target.value);
-                          handleVariationValueChange(index, "image", selectedImage ?? '');
-                        }}
-                      >
-                        <option value="">Select an image</option>
-                        {approvedImages.map((img, i) => (
-                          <option key={i} value={img.file.name}>{img.file.name}</option>
-                        ))}
-                      </select>
+
+                    <div className="min-w-64">
+                    <VariationImageDropdown approvedImages={approvedImages} value={value} handleVariationValueChange={handleVariationValueChange} index={index}></VariationImageDropdown>
+                    </div>
+                 
                     )}
                   {newVariation.prices && (
                     <Input type="number" placeholder="Price" value={value.price} onChange={(e) => handleVariationValueChange(index, "price", e.target.value)} />

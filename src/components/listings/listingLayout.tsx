@@ -16,22 +16,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Spinner from '@/components/ui/spinner'; // Import the spinner component
-function extractFileId(webViewLink:string) {
-  const regex = /\/d\/([a-zA-Z0-9_-]+)\//;
-  const match = webViewLink.match(regex);
-  return match ? match[1] : null;
-}
-const CardComponent = ({ title, content, id, image, sku, price, priceIndia, status, variants, draft }: { title: string, content: string, id: string, image: string, sku: string, price: number, priceIndia: number, status: string, variants: { SKU: string }[], draft?: boolean }) => {
+
+const CardComponent = ({ title, content, id, image, sku, price, priceIndia, status, variants, draft}: { title: string, content: string, id: string, image: string, sku: string, price: number, priceIndia: number, status: string, variants: { SKU: string }[], draft?: boolean }) => {
   
 
-const webViewLink = image;
-const fileId = extractFileId(webViewLink);
   return (
   
     <Card className='flex flex-col justify-between'>
       <div>
       <Image 
-        src={`https://drive.google.com/uc?export=view&id=${fileId}`}
+        src={image ? image : "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.iconfinder.com%2Ficons%2F423153%2Fbox_other_package_packing_shipping_suspicious_unknown_icon&psig=AOvVaw0Bd3WwKwBjZ7cXe69X7mmp&ust=1735041051002000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCKjC_9_pvYoDFQAAAAAdAAAAABAE"}
         width={500} 
         height={500}
         alt="product image"
@@ -82,7 +76,7 @@ const fileId = extractFileId(webViewLink);
 
 const App = () => {
   const [cards, setCards] = useState<{
-    draft: any; _id: string, name: string, description: string, images: any, priceIndia: number, SKU: string
+    draft: any; _id: string, name: string, description: string, images: any, priceIndia: number, SKU: string,primaryImage:string
   }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -196,7 +190,7 @@ const App = () => {
                       id={card._id}
                       title={card.name}
                       content={card.description}
-                      image={card.images && card.images.length > 0 ? (card.images[0]?.webViewLink ? card.images[0].webViewLink.slice(0,-13):"") : ''}  
+                      image={card.primaryImage}  
                       price={card.priceIndia}
                       priceIndia={card.priceIndia}
                       sku={card.SKU || 'N/A'}

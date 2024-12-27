@@ -217,6 +217,9 @@ export const addListing=async (data:FormData)=>{
         featured:false,
         featuredCategory:"",
         sku:"",
+        color:"",
+        length:0,
+        width:0,
     }
 
     
@@ -250,7 +253,11 @@ export const addListing=async (data:FormData)=>{
         category:data.get('category') as string,
         featured:data.get('featured')=="true"?true:false,
         featuredCategory:data.get('featuredCatgory') as string,
-        sku:data.get('sku') as string
+        sku:data.get('sku') as string,
+        color:data.get('color') as string,
+        length:Number(data.get('length')) as number ,
+        width:Number(data.get('width')) as number,
+
     }
 
 
