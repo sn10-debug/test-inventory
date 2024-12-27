@@ -11,7 +11,7 @@ const ListingSchema = new Schema({
     type: String,
     required: [true, "Description should be provided"],
   },
-  color:Number,
+  color:String,
   length:Number,
   width:Number,
   videoLink:String,
