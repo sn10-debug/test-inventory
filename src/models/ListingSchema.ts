@@ -15,7 +15,7 @@ const ListingSchema = new Schema({
   length:Number,
   width:Number,
   videoLink:String,
-  SKU:String,
+  sku:String,
   images: [String],
   primaryImage: String,
   createdAt: {
@@ -76,7 +76,7 @@ const ListingSchema = new Schema({
         priceIndia: Number,
         priceEverywhereElse: Number,
         quantity: Number,
-        SKU: String,
+        sku: String,
       }],
     },
   ],
